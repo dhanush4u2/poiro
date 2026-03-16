@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 /* ═══════════════════════════════════════════════════════
    POIRO OPERATING SYSTEM — Premium pipeline visualization
    4 stages: Context → Insights → Brandify → Omni-Focus
-   Scroll-driven activation with animated data flow lines.
+   Scroll-driven reveal with smooth in/out transitions.
    ═══════════════════════════════════════════════════════ */
 
 const PIPELINE = [
@@ -42,34 +42,88 @@ const PIPELINE = [
 export default function OperatingSystemSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeStage, setActiveStage] = useState(-1);
-  const hasAnimated = useRef(false);
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      /* Entrance animation — run once */
-      if (!hasAnimated.current) {
+      /* ── Header: fade + slide in ── */
+      gsap.fromTo(
+        ".os-header-reveal",
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".os-header-wrap",
+            start: "top 70%",
+            once: true,
+          },
+        }
+      );
+
+      /* ── Each pipeline card: staggered reveal ── */
+      const cards = sectionRef.current!.querySelectorAll(".os-card");
+      cards.forEach((card) => {
         gsap.fromTo(
-          ".os-header-reveal",
-          { opacity: 0, y: 50 },
+          card,
+          { opacity: 0, y: 80, scale: 0.97 },
           {
             opacity: 1,
             y: 0,
+            scale: 1,
             duration: 1,
-            stagger: 0.15,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: sectionRef.current,
+              trigger: card,
               start: "top 80%",
               once: true,
             },
           }
         );
-        hasAnimated.current = true;
-      }
 
-      /* Pipeline stage progression driven by scroll */
+        /* Connector lines between cards */
+        const connector = card.querySelector(".os-connector");
+        if (connector) {
+          gsap.fromTo(
+            connector,
+            { scaleY: 0, opacity: 0 },
+            {
+              scaleY: 1,
+              opacity: 1,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 65%",
+                once: true,
+              },
+            }
+          );
+        }
+      });
+
+      /* ── Status bar at bottom ── */
+      gsap.fromTo(
+        ".os-status-bar",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".os-status-bar",
+            start: "top 80%",
+            once: true,
+          },
+        }
+      );
+
+      /* ── Pipeline stage progression driven by scroll ── */
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top 40%",
@@ -116,7 +170,7 @@ export default function OperatingSystemSection() {
 
       <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%", position: "relative" }}>
         {/* ── Header ── */}
-        <div style={{ marginBottom: "clamp(48px, 6vw, 96px)" }}>
+        <div className="os-header-wrap" style={{ marginBottom: "clamp(48px, 6vw, 96px)" }}>
           <p
             className="os-header-reveal"
             style={{
@@ -126,6 +180,7 @@ export default function OperatingSystemSection() {
               letterSpacing: "0.18em",
               color: "var(--color-brand-orange)",
               marginBottom: "var(--space-2)",
+              fontWeight: 600,
             }}
           >
             System Architecture
@@ -147,8 +202,8 @@ export default function OperatingSystemSection() {
             className="os-header-reveal"
             style={{
               marginTop: "var(--space-3)",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.8rem",
+              fontSize: "0.9rem",
+              fontWeight: 500,
               color: "var(--color-dark-gray)",
               maxWidth: 580,
               lineHeight: 1.7,
@@ -166,7 +221,7 @@ export default function OperatingSystemSection() {
             const isCurrent = idx === activeStage;
 
             return (
-              <div key={stage.name}>
+              <div key={stage.name} className="os-card">
                 {/* Stage card */}
                 <div
                   style={{
@@ -194,9 +249,7 @@ export default function OperatingSystemSection() {
                       fontFamily: "var(--font-mono)",
                       fontSize: "clamp(28px, 4vw, 52px)",
                       fontWeight: 700,
-                      color: isActive
-                        ? "var(--color-brand-orange)"
-                        : "var(--color-border-gray)",
+                      color: isActive ? "var(--color-brand-orange)" : "var(--color-border-gray)",
                       transition: "color 0.5s ease",
                       lineHeight: 1,
                       minWidth: "60px",
@@ -222,11 +275,9 @@ export default function OperatingSystemSection() {
                     </h3>
                     <p
                       style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "0.75rem",
-                        color: isActive
-                          ? "var(--color-light-gray)"
-                          : "var(--color-border-gray)",
+                        fontSize: "0.82rem",
+                        fontWeight: 500,
+                        color: isActive ? "var(--color-light-gray)" : "var(--color-border-gray)",
                         transition: "color 0.5s ease",
                         maxWidth: 480,
                         lineHeight: 1.6,
@@ -251,6 +302,7 @@ export default function OperatingSystemSection() {
                         style={{
                           fontFamily: "var(--font-mono)",
                           fontSize: "0.65rem",
+                          fontWeight: 600,
                           letterSpacing: "0.08em",
                           textTransform: "uppercase",
                           padding: "4px 10px",
@@ -277,11 +329,13 @@ export default function OperatingSystemSection() {
                 {/* Connector line between stages */}
                 {idx < PIPELINE.length - 1 && (
                   <div
+                    className="os-connector"
                     style={{
                       display: "flex",
                       justifyContent: "center",
                       padding: "0",
                       position: "relative",
+                      transformOrigin: "top center",
                     }}
                   >
                     <div
@@ -294,7 +348,6 @@ export default function OperatingSystemSection() {
                         transition: "background 0.5s ease",
                       }}
                     />
-                    {/* Dot at junction */}
                     <div
                       style={{
                         position: "absolute",
@@ -318,6 +371,7 @@ export default function OperatingSystemSection() {
 
         {/* ── Bottom status bar ── */}
         <div
+          className="os-status-bar"
           style={{
             marginTop: "clamp(40px, 5vw, 80px)",
             display: "flex",
@@ -344,22 +398,24 @@ export default function OperatingSystemSection() {
               style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: "0.65rem",
+                fontWeight: 600,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 color: "var(--color-dark-gray)",
               }}
             >
               {activeStage >= PIPELINE.length - 1
-                ? "Pipeline Active — All Modules Online"
+                ? "Pipeline Active \u2014 All Modules Online"
                 : activeStage >= 0
-                ? `Processing — ${PIPELINE[activeStage].name} Module`
+                ? `Processing \u2014 ${PIPELINE[activeStage].name} Module`
                 : "Pipeline Standby"}
             </span>
           </div>
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "0.6rem",
+              fontSize: "0.65rem",
+              fontWeight: 600,
               color: "var(--color-border-gray)",
               letterSpacing: "0.1em",
             }}

@@ -9,7 +9,7 @@ export const FRAME_SEGMENTS = {
     /** First frame of the hero video */
     start: 0,
     /** Last frame of the hero video (0-indexed, inclusive) */
-    end: 481,
+    end: 599,
     /** Frames auto-played before scroll takes over */
     introEnd: 180,
     /** Duration of the auto-play intro in seconds */
@@ -17,13 +17,13 @@ export const FRAME_SEGMENTS = {
     /** Frame where the explosion effect begins */
     explosionStart: 300,
     /** Frame where the explosion effect ends */
-    explosionEnd: 481,
+    explosionEnd: 420,
   },
   SECOND_VIDEO: {
     /** First frame of the second video segment */
-    start: 481,
+    start: 600,
     /** Last frame of the second video segment */
-    end: 661,
+    end: 779,
   },
 } as const;
 

@@ -4,15 +4,17 @@ import { useRef, useEffect, useCallback } from "react";
 import { FRAME_SEGMENTS } from "@/../lib/frameSegments";
 
 /* ═══════════════════════════════════════════════════════
-   FRAME-SEQUENCE HERO CANVAS
-   Preloads hero frames and draws the current frame
-   on a <canvas> using drawImage. Driven by `frameIndex`.
-   Fires propheus:load-progress / propheus:load-complete
-   events for integration with the PagePreloader.
+   FRAME-SEQUENCE CANVAS
+   Preloads hero frames first (fires load-progress events),
+   then lazily preloads second-video frames in the background.
+   Accepts any absolute frameIndex (0→SECOND_VIDEO.end)
+   and draws the matching image on a <canvas>.
    ═══════════════════════════════════════════════════════ */
 
 const HERO = FRAME_SEGMENTS.HERO;
-const TOTAL_FRAMES = HERO.end - HERO.start + 1;
+const SV = FRAME_SEGMENTS.SECOND_VIDEO;
+const HERO_COUNT = HERO.end - HERO.start + 1;
+const TOTAL_FRAMES = SV.end - HERO.start + 1;
 
 function framePath(index: number): string {
   return `/frames/frame_${String(index).padStart(5, "0")}.webp`;
@@ -30,41 +32,57 @@ export default function HeroCanvas({ frameIndex, onFramesLoaded }: HeroCanvasPro
   const loadedRef = useRef(false);
   const rafRef = useRef(0);
 
-  /* ── Preload all frames ── */
+  /* ── Preload hero frames first, then second-video frames lazily ── */
   useEffect(() => {
     if (loadedRef.current) return;
 
     const images: HTMLImageElement[] = new Array(TOTAL_FRAMES);
     let loaded = 0;
 
-    const promises = Array.from({ length: TOTAL_FRAMES }, (_, i) => {
+    function loadImage(absoluteFrame: number): Promise<void> {
+      const localIndex = absoluteFrame - HERO.start;
       return new Promise<void>((resolve) => {
         const img = new Image();
-        img.src = framePath(HERO.start + i);
+        img.src = framePath(absoluteFrame);
         img.onload = () => {
-          images[i] = img;
+          images[localIndex] = img;
           loaded++;
-          const pct = Math.floor((loaded / TOTAL_FRAMES) * 100);
-          window.dispatchEvent(
-            new CustomEvent("propheus:load-progress", {
-              detail: { value: Math.min(pct, 99) },
-            })
-          );
+          if (absoluteFrame <= HERO.end) {
+            const pct = Math.floor((loaded / HERO_COUNT) * 100);
+            window.dispatchEvent(
+              new CustomEvent("propheus:load-progress", {
+                detail: { value: Math.min(pct, 99) },
+              })
+            );
+          }
           resolve();
         };
         img.onerror = () => {
-          images[i] = img;
+          images[localIndex] = img;
           loaded++;
           resolve();
         };
       });
-    });
+    }
 
-    Promise.all(promises).then(() => {
+    /* Load hero frames (critical path) */
+    const heroPromises = Array.from({ length: HERO_COUNT }, (_, i) =>
+      loadImage(HERO.start + i)
+    );
+
+    Promise.all(heroPromises).then(() => {
       framesRef.current = images;
       loadedRef.current = true;
       window.dispatchEvent(new CustomEvent("propheus:load-complete"));
       onFramesLoaded?.();
+
+      /* Lazily load second-video frames in the background */
+      const svCount = SV.end - SV.start + 1;
+      for (let i = 0; i < svCount; i++) {
+        loadImage(SV.start + i).then(() => {
+          framesRef.current = images;
+        });
+      }
     });
   }, [onFramesLoaded]);
 

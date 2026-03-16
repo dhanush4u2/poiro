@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PrimaryButton, SecondaryButton } from "@/components/componentBoard";
@@ -9,7 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* ═══════════════════════════════════════════════════════
    FOOTER CTA — Premium closing section
-   Animated entrance, glowing demo button, ticking stats.
+   Smooth scroll-driven reveal with o_logo, glow effects,
+   and reversible animations.
    ═══════════════════════════════════════════════════════ */
 
 export default function FooterCTASection() {
@@ -20,25 +22,24 @@ export default function FooterCTASection() {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      /* Staggered reveal */
+      /* ── Logo reveal ── */
       gsap.fromTo(
-        ".footer-reveal",
-        { opacity: 0, y: 60 },
+        ".footer-logo",
+        { opacity: 0, scale: 0.8 },
         {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          stagger: 0.12,
+          opacity: 0.06,
+          scale: 1,
+          duration: 1.4,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 70%",
+            start: "top 65%",
             once: true,
           },
         }
       );
 
-      /* Horizontal line draw */
+      /* ── Horizontal line draw ── */
       gsap.fromTo(
         ".footer-line-draw",
         { scaleX: 0 },
@@ -48,7 +49,42 @@ export default function FooterCTASection() {
           ease: "power3.inOut",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 65%",
+            start: "top 60%",
+            once: true,
+          },
+        }
+      );
+
+      /* ── Staggered content reveal ── */
+      gsap.fromTo(
+        ".footer-reveal",
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 55%",
+            once: true,
+          },
+        }
+      );
+
+      /* ── Bottom links slide up ── */
+      gsap.fromTo(
+        ".footer-bottom",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".footer-bottom",
+            start: "top 85%",
             once: true,
           },
         }
@@ -73,6 +109,29 @@ export default function FooterCTASection() {
         overflow: "hidden",
       }}
     >
+      {/* Background o_logo watermark */}
+      <div
+        className="footer-logo"
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "clamp(400px, 50vw, 800px)",
+          height: "clamp(400px, 50vw, 800px)",
+          pointerEvents: "none",
+          opacity: 0,
+        }}
+      >
+        <Image
+          src="/o_logo.png"
+          alt=""
+          fill
+          style={{ objectFit: "contain", filter: "brightness(0.5)" }}
+          aria-hidden="true"
+        />
+      </div>
+
       {/* Background glow that reacts to CTA hover */}
       <div
         style={{
@@ -113,7 +172,8 @@ export default function FooterCTASection() {
           className="footer-reveal"
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "0.68rem",
+            fontSize: "0.75rem",
+            fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "0.18em",
             color: "var(--color-brand-orange)",
@@ -128,7 +188,7 @@ export default function FooterCTASection() {
           className="footer-reveal"
           style={{
             fontSize: "clamp(42px, 7vw, 120px)",
-            fontWeight: 800,
+            fontWeight: 900,
             lineHeight: 0.92,
             letterSpacing: "-0.03em",
             textTransform: "uppercase",
@@ -145,13 +205,13 @@ export default function FooterCTASection() {
           style={{
             marginTop: "var(--space-4)",
             fontSize: "clamp(16px, 1.8vw, 22px)",
+            fontWeight: 500,
             color: "var(--color-dark-gray)",
             maxWidth: 600,
             lineHeight: 1.55,
           }}
         >
           Build your brand&apos;s creative engine with Poiro.
-          Stop managing chaos — start engineering output.
         </p>
 
         {/* CTA buttons */}
@@ -167,84 +227,45 @@ export default function FooterCTASection() {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          <PrimaryButton size="lg">Book Demo</PrimaryButton>
-          <SecondaryButton size="lg">Save Your Spot</SecondaryButton>
-        </div>
-
-        {/* Bottom info bar */}
-        <div
-          className="footer-reveal"
-          style={{
-            marginTop: "clamp(60px, 8vw, 120px)",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "1px",
-            background: "var(--color-border-gray)",
-            border: "1px solid var(--color-border-gray)",
-          }}
-        >
-          {[
-            { value: "4", label: "Pipeline Modules" },
-            { value: "< 200ms", label: "Insight Latency" },
-            { value: "12+", label: "Output Channels" },
-            { value: "∞", label: "Creative Scale" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                padding: "var(--space-3) var(--space-3)",
-                background: "#000",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "clamp(24px, 3vw, 36px)",
-                  fontWeight: 700,
-                  color: "#fff",
-                  lineHeight: 1,
-                  marginBottom: "6px",
-                }}
-              >
-                {stat.value}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "var(--color-dark-gray)",
-                }}
-              >
-                {stat.label}
-              </div>
-            </div>
-          ))}
+          <PrimaryButton size="lg">Save Your Spot</PrimaryButton>
+          <SecondaryButton size="lg">Book Demo</SecondaryButton>
         </div>
 
         {/* Footer bottom */}
         <div
-          className="footer-reveal"
+          className="footer-bottom"
           style={{
-            marginTop: "clamp(40px, 5vw, 80px)",
+            marginTop: "clamp(60px, 8vw, 120px)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
             gap: "var(--space-2)",
+            borderTop: "1px solid var(--color-border-gray)",
+            paddingTop: "var(--space-3)",
           }}
         >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.65rem",
-              color: "var(--color-border-gray)",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}
-          >
-            &copy; {new Date().getFullYear()} Poiro. All rights reserved.
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <Image
+              src="/o_logo.png"
+              alt="Poiro"
+              width={20}
+              height={20}
+              style={{ opacity: 0.6 }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                color: "var(--color-border-gray)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              &copy; {new Date().getFullYear()} Poiro
+            </span>
+          </div>
           <div style={{ display: "flex", gap: "var(--space-3)" }}>
             {["Privacy", "Terms", "Contact"].map((link) => (
               <a
@@ -252,7 +273,8 @@ export default function FooterCTASection() {
                 href="#"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: "0.65rem",
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
                   color: "var(--color-dark-gray)",
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",

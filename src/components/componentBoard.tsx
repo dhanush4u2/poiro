@@ -15,12 +15,38 @@ interface NavProps {
 
 export function Nav({ onCtaClick }: NavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const scrollDirectionRef = useRef<"up" | "down">("down");
+  const thresholdRef = useRef(0);
 
   useEffect(() => {
+    // Calculate threshold for frame 180 (intro ends)
+    // PERCENT_PER_FRAME = 1.25% per frame, so frame 180 ≈ 180 * 1.25% of viewport height
+    thresholdRef.current = window.innerHeight * (180 * 1.25 / 100);
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 40);
+
+      // Determine scroll direction
+      if (currentScrollY > lastScrollYRef.current) {
+        scrollDirectionRef.current = "down";
+      } else if (currentScrollY < lastScrollYRef.current) {
+        scrollDirectionRef.current = "up";
+      }
+
+      // Hide navbar when scrolling down past threshold, show when scrolling up
+      if (currentScrollY > thresholdRef.current) {
+        setIsHidden(scrollDirectionRef.current === "down");
+      } else {
+        setIsHidden(false);
+      }
+
+      lastScrollYRef.current = currentScrollY;
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -31,7 +57,7 @@ export function Nav({ onCtaClick }: NavProps) {
       style={{
         top: "var(--space-3)",
         left: "50%",
-        transform: "translateX(-50%)",
+        transform: isHidden ? "translate(-50%, -120%)" : "translateX(-50%)",
         width: "95%",
         maxWidth: "1280px",
         height: "64px",
