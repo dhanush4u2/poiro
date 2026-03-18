@@ -172,6 +172,9 @@ export default function HeroCanvas({ frameIndex, onFramesLoaded }: HeroCanvasPro
         inset: 0,
         width: "100%",
         height: "100%",
+        objectFit: "cover",
+        objectPosition: "center",
+        display: "block",
         background: "#000",
       }}
     />

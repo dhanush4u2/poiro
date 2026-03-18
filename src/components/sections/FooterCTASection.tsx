@@ -13,11 +13,80 @@ gsap.registerPlugin(ScrollTrigger);
    FOOTER CTA — Grassland TV background + CRT overlay
    ═══════════════════════════════════════════════════════ */
 
-/* All values are percentages relative to scene container size. */
+/* CRT overlay coordinates relative to 16:9 scene container */
 const CRT_CENTER_X = "48.8%";
-const CRT_CENTER_Y = "31%";
+const CRT_CENTER_Y = "41.5%";
 const CRT_WIDTH = "8.8%";
-const CRT_HEIGHT = "15%";
+const CRT_HEIGHT = "13%";
+
+function FooterScene() {
+  return (
+    <div
+      className="footer-scene"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1,
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: "min(100vw, 177.78vh)",
+          aspectRatio: "16 / 9",
+          flexShrink: 0,
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          src="/elements/footer.png"
+          alt="Poiro footer scene"
+          fill
+          priority
+          sizes="100vw"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center bottom",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.38) 70%, rgba(0,0,0,0.78) 100%)",
+            zIndex: 1,
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            left: CRT_CENTER_X,
+            top: CRT_CENTER_Y,
+            width: CRT_WIDTH,
+            height: CRT_HEIGHT,
+            transform: "translate(-50%, -50%)",
+            zIndex: 3,
+            pointerEvents: "none",
+          }}
+        >
+          <CRTScreen />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function FooterCTASection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -78,52 +147,7 @@ export default function FooterCTASection() {
         overflow: "hidden",
       }}
     >
-      <div
-        className="footer-scene"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 1,
-        }}
-      >
-        <Image
-          src="/elements/footer.png"
-          alt="Poiro footer scene"
-          fill
-          priority={false}
-          sizes="(max-width: 768px) 100vw, (max-width: 1440px) 100vw, 1440px"
-          style={{ objectFit: "cover", objectPosition: "center bottom" }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.38) 70%, rgba(0,0,0,0.78) 100%)",
-            zIndex: 1,
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            top: CRT_CENTER_Y,
-            left: CRT_CENTER_X,
-            width: CRT_WIDTH,
-            height: CRT_HEIGHT,
-            transform: "translate(-50%, -50%)",
-            zIndex: 3,
-            pointerEvents: "none",
-          }}
-        >
-          <CRTScreen />
-        </div>
-
-      </div>
+      <FooterScene />
 
       <div
         className="footer-reveal"
