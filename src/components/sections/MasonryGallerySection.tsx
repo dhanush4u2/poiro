@@ -142,7 +142,7 @@ export default function MasonryGallerySection() {
 
     const bootstrap = async () => {
       const activeLoaded = await loadCategoryItems(activeTab.folder);
-      const activePrecomputed = await precomputeMedia(activeLoaded, { eagerVideo: true });
+      const activePrecomputed = await precomputeMedia(activeLoaded, { eagerVideo: false });
 
       if (cancelled) return;
 
@@ -220,7 +220,7 @@ export default function MasonryGallerySection() {
     }
 
     const loaded = await loadCategoryItems(tab.folder);
-    const precomputed = await precomputeMedia(loaded, { eagerVideo: true });
+    const precomputed = await precomputeMedia(loaded, { eagerVideo: false });
     setItemsByFolder((prev) => ({ ...prev, [tab.folder]: precomputed }));
     setItems(precomputed);
     setActiveTab(tab);

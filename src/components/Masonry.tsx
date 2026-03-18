@@ -85,6 +85,8 @@ export default function Masonry({
 
   const [containerRef, { width }] = useMeasure<HTMLDivElement>();
   const [imagesReady, setImagesReady] = useState(false);
+  const [playableVideoIds, setPlayableVideoIds] = useState<Set<string>>(new Set());
+  const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   const getInitialPosition = (
     item: MasonryItem & { x: number; y: number; w: number; h: number }
@@ -122,6 +124,71 @@ export default function Masonry({
     const raf = requestAnimationFrame(() => setImagesReady(true));
     return () => cancelAnimationFrame(raf);
   }, [items, animationKey]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setPlayableVideoIds(new Set());
+
+    const videoItems = items.filter((item) => item.type === "video");
+    if (!videoItems.length) return;
+
+    const warmAndPlayOneVideo = (id: string) =>
+      new Promise<void>((resolve) => {
+        const video = videoRefs.current[id];
+        if (!video) {
+          resolve();
+          return;
+        }
+
+        let settled = false;
+
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        };
+
+        video.preload = "auto";
+        video.muted = true;
+        video.playsInline = true;
+        video.oncanplaythrough = finish;
+        video.onloadeddata = finish;
+        video.onerror = finish;
+        setTimeout(finish, 7000);
+        video.load();
+      });
+
+    const queue = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+
+      for (const item of videoItems) {
+        if (cancelled) return;
+        await warmAndPlayOneVideo(item.id);
+        if (cancelled) return;
+
+        const mountedVideo = videoRefs.current[item.id];
+        if (mountedVideo) {
+          try {
+            await mountedVideo.play();
+          } catch {
+            // Ignore autoplay rejections; preview frame is still shown.
+          }
+        }
+
+        setPlayableVideoIds((prev) => {
+          const next = new Set(prev);
+          next.add(item.id);
+          return next;
+        });
+      }
+    };
+
+    void queue();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items]);
 
   const grid = useMemo(() => {
     if (!width) return [] as Array<MasonryItem & { x: number; y: number; w: number; h: number }>;
@@ -262,12 +329,20 @@ export default function Masonry({
           <div className="item-img">
             {item.type === "video" ? (
               <video
+                ref={(el) => {
+                  videoRefs.current[item.id] = el;
+                }}
                 src={item.src}
-                autoPlay
+                autoPlay={playableVideoIds.has(item.id)}
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload={playableVideoIds.has(item.id) ? "auto" : "metadata"}
+                onLoadedData={(event) => {
+                  if (!playableVideoIds.has(item.id)) {
+                    event.currentTarget.pause();
+                  }
+                }}
                 className="h-full w-full object-cover"
               />
             ) : (
