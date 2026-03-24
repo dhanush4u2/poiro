@@ -112,7 +112,12 @@ export default function PagePreloader() {
       try {
         const folders = ["short-form", "statics", "ugc-affiliate", "tvc-animatics"];
         const fetchPromises = folders.map((folder) =>
-          fetch(`/api/masonry?folder=${folder}`).then((res) => res.json())
+          fetch(`/api/masonry?folder=${folder}`)
+            .then((res) => {
+              if (!res.ok) throw new Error("bad-res");
+              return res.json();
+            })
+            .catch(() => ({ media: [] })) // Swallow strict errors per folder
         );
         
         const results = await Promise.all(fetchPromises);
@@ -129,7 +134,7 @@ export default function PagePreloader() {
         });
 
         // Block until all images are fully buffered by the browser
-        await Promise.all(
+        const imageLoadPromises = Promise.all(
           mediaUrls.map(
             (url) =>
               new Promise((resolve) => {
@@ -140,6 +145,13 @@ export default function PagePreloader() {
               })
           )
         );
+
+        // Force a maximum timeout so the user is never stuck at 85% indefinitely 
+        // if their connection is slow or if CDN lags. 3.5s is usually plenty for initial batch.
+        const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3500));
+        
+        await Promise.race([imageLoadPromises, timeoutPromise]);
+
       } catch (e) {
         console.error("Preloader: Failed to fetch masonry manifests", e);
       } finally {

@@ -18,7 +18,7 @@ const MODULES: ModuleConfig[] = [
     title: "Curate Context",
     system: "Brand Cosmos",
     description: "Tap into a living universe of trends and audience signals to create content your consumers can't scroll past. Tracking the best brands and creators in your category, Brand Cosmos parses thousands of hours of content to surface the most compelling ideas, storylines, visual concepts and hooks, so inspiration is never more than a search away. Stay ahead of the curve, always.",
-    image: "/os/brand-cosmos.mp4",
+    image: "/os/Brand-Cosmos.mp4",
   },
   {
     id: "atlas",

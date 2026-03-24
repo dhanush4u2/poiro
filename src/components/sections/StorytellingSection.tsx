@@ -162,7 +162,7 @@ export default function StorytellingSection() {
             opacity: 0,
           }}
         >
-          Storytelling = <Highlighter show={showH1} action="crossed-off" color="#ff8015" padding={3} strokeWidth={3}>Prompting</Highlighter>{" "}
+          Storytelling ≠ <Highlighter show={showH1} action="crossed-off" color="#ff8015" padding={3} strokeWidth={3}>Prompting</Highlighter>{" "}
         </h2>
 
         {/* Description */}
