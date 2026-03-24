@@ -104,7 +104,7 @@ export default function LogoMarquee() {
           style={{
             marginTop: "clamp(30px, 4vw, 48px)",
             borderRadius: "14px",
-            background: "rgba(255,255,255,0.02)",
+            background: "rgba(0, 0, 0, 0.02)",
             padding: "clamp(20px, 3vw, 32px) 0",
             position: "relative",
             overflow: "hidden",

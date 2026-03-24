@@ -201,24 +201,32 @@ export default function PagePreloader() {
       <motion.div
         initial={{ y: 0 }}
         animate={controls}
-        className="fixed inset-0 z-[10000] bg-[#FF8015] flex flex-col items-center justify-center pointer-events-auto"
+        className="fixed inset-0 z-[10000] bg-[#000000] flex flex-col items-center justify-center pointer-events-auto"
       >
         <div className="relative inline-flex flex-col items-center">
           
           {/* LOGO CONTAINER */}
-          <div className="relative text-7xl md:text-8xl lg:text-[8rem] font-bold tracking-tighter" style={{ fontFamily: "'Comfortaa', cursive" }}>
+          <div className="relative">
             
-            {/* Base Layer: Faded/Transparent Black Outline effect */}
-            <div className="text-black/10 select-none">
-              Pôirō
+            {/* Base Layer: Faded/Transparent Layer */}
+            <div className="select-none opacity-20">
+              <img 
+                src="/logo.png" 
+                alt="Poiro Logo" 
+                className="w-[200px] md:w-[300px] lg:w-[400px] h-auto object-contain" 
+              />
             </div>
 
-            {/* Fill Layer: Solid Black, clipped by progress */}
+            {/* Fill Layer: Solid Layer, clipped by progress */}
             <motion.div
-              className="absolute top-0 left-0 text-black whitespace-nowrap overflow-hidden select-none"
+              className="absolute top-0 left-0 overflow-hidden select-none"
               style={{ clipPath }}
             >
-              Pôirō
+              <img 
+                src="/logo.png" 
+                alt="Poiro Logo" 
+                className="w-[200px] md:w-[300px] lg:w-[400px] h-auto object-contain" 
+              />
             </motion.div>
           </div>
 

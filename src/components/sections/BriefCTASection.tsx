@@ -379,7 +379,7 @@ function BriefCTASection() {
           .brief-anim-success-pop { animation: successPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
           .brief-animate-text-flow {
-            background: linear-gradient(to right, #ff8015, #f8ff23, #ff8015);
+            background: linear-gradient(to right, #ff8015, #ff5315, #ff8015);
             background-size: 200% auto;
             animation: textFlow 4s linear infinite;
             -webkit-background-clip: text;
@@ -487,6 +487,7 @@ function BriefCTASection() {
           </h2>
           <h4
             style={{
+              fontFamily: "var(--font-figtree)",
               marginTop: "clamp(15px, 2.4vw, 15px)",
               fontSize: "clamp(14px, 2vw, 24px)",
               lineHeight: 1.45,
@@ -564,6 +565,7 @@ function BriefCTASection() {
             <button
               type="button"
               disabled={uploadState === "uploading"}
+              style={{ fontFamily: "var(--font-figtree)" }}
               className={`relative min-w-[300px] md:min-w-[340px] min-h-[52px] md:min-h-[58px] px-12 md:px-14 py-4 md:py-5 backdrop-blur-md rounded-full font-bold uppercase tracking-[0.16em] text-[15px] overflow-hidden flex items-center justify-center transition-all duration-500 ${
                 uploadState === "idle"
                   ? "bg-[#0a0a0a]/80 border border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:border-white group-hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] active:scale-[0.96] active:bg-[#e0e0e0] active:shadow-inner"
@@ -932,6 +934,7 @@ function BriefCTASection() {
                 </button>
                 <button
                   type="button"
+                  style={{ fontFamily: "var(--font-figtree)" }}
                   className="brief-modal-btn bg-gradient-to-r from-[#ff6b2b] to-[#ff8015] text-black font-bold hover:brightness-110 transition"
                   onClick={handleSendBrief}
                 >

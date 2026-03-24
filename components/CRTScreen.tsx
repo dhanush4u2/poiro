@@ -180,11 +180,12 @@ export function CRTScreen({ className = "" }: { className?: string }) {
 }
 
 const PoiroLogo = () => (
-  <div
-    className={`crt-text-wrap font-black tracking-tight text-[#ff8015] glow-text drop-shadow-[0_0_15px_rgba(255,95,31,0.5)] ${comfortaa.className}`}
-    style={{ fontSize: CRT_FONT_SIZES.poiro }}
-  >
-    Pôirō
+  <div className="crt-text-wrap flex justify-center items-center drop-shadow-[0_0_15px_rgba(255,95,31,0.5)]">
+    <img 
+      src="/logo.png" 
+      alt="Poiro Logo" 
+      className="w-11/12 max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+    />
   </div>
 );
 

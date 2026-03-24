@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useScroll, useMotionValueEvent, motion } from "motion/react";
+import { Highlighter } from "@/components/TextHighlighter";
 
 type ModuleConfig = {
   id: string;
@@ -16,14 +17,14 @@ const MODULES: ModuleConfig[] = [
     id: "context",
     title: "Curate Context",
     system: "Brand Cosmos",
-    description: "Map audience signals, cultural context, and brand positioning into a living strategic universe.",
-    image: "/os/brand-cosmos.webp",
+    description: "Tap into a living universe of trends and audience signals to create content your consumers can't scroll past.",
+    image: "/os/brand-cosmos.mp4",
   },
   {
     id: "atlas",
     title: "Ideate & Communicate",
     system: "Atlas",
-    description: "Translate insights into narrative direction and messaging systems.",
+    description: "Where great ideas become brilliant briefs, and creative teams finally work as one.",
     image: "/os/atlas.webp",
   },
   {
@@ -83,7 +84,10 @@ export default function OperatingSystemSection() {
       className="os-feature-matrix"
       style={{
         position: "relative",
-        padding: "clamp(80px, 12vw, 180px) var(--space-3)",
+        paddingTop: "clamp(60px, 8vw, 100px)", /* Adjusted: Reduced top padding to lessen gap from LayersSection */
+        paddingBottom: "clamp(80px, 12vw, 180px)",
+        paddingLeft: "var(--space-3)",
+        paddingRight: "var(--space-3)",
         background: "#000000",
       }}
     >
@@ -95,7 +99,7 @@ export default function OperatingSystemSection() {
           }
 
           .os-animate-text-flow {
-            background: linear-gradient(to right, #ff7809, #ffea2b, #ff8015);
+            background: linear-gradient(to right, #ff8015, #ff5315, #ff8015);
             background-size: 200% auto;
             animation: osTextFlow 4s linear infinite;
             -webkit-background-clip: text;
@@ -138,21 +142,27 @@ export default function OperatingSystemSection() {
         <div style={{ marginBottom: "clamp(40px, 6vw, 80px)", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
           <p
             style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.7rem",
+              fontFamily: "var(--font-figtree), sans-serif",
+              fontSize: "0.80rem",
               textTransform: "uppercase",
-              letterSpacing: "0.2em",
-              color: "var(--color-brand-orange)",
-              marginBottom: "var(--space-2)",
+              letterSpacing: "0.15em",
+              color: "#ffffff",
+              marginBottom: "var(--space-4)",
               fontWeight: 600,
+              background: "#ff8015",
+              padding: "8px 24px",
+              borderRadius: "9999px",
+              display: "inline-block",
+              boxShadow: "0 4px 14px rgba(255, 128, 21, 0.4)",
             }}
           >
             System Architecture
           </p>
           <h2
             style={{
+              fontFamily: "var(--font-figtree), sans-serif",
               fontSize: "clamp(36px, 6vw, 84px)",
-              fontWeight: 800,
+              fontWeight: 700,
               lineHeight: 1.04,
               letterSpacing: "-0.03em",
               maxWidth: 900,
@@ -185,32 +195,35 @@ export default function OperatingSystemSection() {
                   >
                     <p
                       style={{
-                        fontFamily: "var(--font-mono, monospace)",
+                        fontFamily: "var(--font-figtree), sans-serif",
                         fontSize: "0.85rem",
                         textTransform: "uppercase",
                         letterSpacing: "0.05em",
-                        color: activeCard === index ? "#ffffff" : "rgba(255,255,255,0.6)",
+                        color: "#ff8015",
                         marginBottom: "8px",
                         fontWeight: 500,
-                        transition: "color 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
                       }}
                     >
                       0{index + 1}. {module.title}
                     </p>
                     <h3
                       style={{
+                        fontFamily: "var(--font-figtree), sans-serif",
                         fontSize: "clamp(32px, 3vw, 42px)",
                         fontWeight: 800,
-                        color: "#fff",
+                        color: "#ffffff",
                         letterSpacing: "-0.02em",
                         lineHeight: 1.1,
                         marginBottom: "12px",
                       }}
                     >
-                      {module.system}
+                      <Highlighter show={activeCard >= index} action="underline" color="#ff8015" strokeWidth={3} padding={4}>
+                        {module.system}
+                      </Highlighter>
                     </h3>
                     <p
                       style={{
+                        fontFamily: "var(--font-figtree), sans-serif",
                         fontSize: "1.05rem",
                         color: "rgba(255,255,255,0.7)",
                         lineHeight: 1.7,
@@ -234,11 +247,22 @@ export default function OperatingSystemSection() {
                         marginTop: "24px",
                       }}
                     >
-                      <img
-                        src={module.image}
-                        alt={module.system}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
+                      {module.image.endsWith(".mp4") ? (
+                        <video
+                          src={module.image}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <img
+                          src={module.image}
+                          alt={module.system}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      )}
                     </div>
                   </motion.div>
                 </div>
@@ -272,15 +296,30 @@ export default function OperatingSystemSection() {
                   inset: 0,
                 }}
               >
-                <img
-                  src={activeModule.image}
-                  alt={activeModule.system}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+                {activeModule.image.endsWith(".mp4") ? (
+                  <video
+                    src={activeModule.image}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={activeModule.image}
+                    alt={activeModule.system}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                )}
                 <div
                   style={{
                     position: "absolute",
@@ -296,6 +335,7 @@ export default function OperatingSystemSection() {
           <div style={{ marginTop: "clamp(160px, 12vw, 240px)", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
             <h2
               style={{
+                fontFamily: "var(--font-figtree), sans-serif",
                 fontSize: "clamp(36px, 6vw, 84px)",
                 fontWeight: 800,
                 lineHeight: 1.04,
@@ -304,7 +344,7 @@ export default function OperatingSystemSection() {
                 margin: "0 auto",
               }}
             >
-              Here's What Happens to your{" "}
+              Here's What Happens <br />to your{" "}
               <span className="os-animate-text-flow">Brief.</span>
             </h2>
           </div>

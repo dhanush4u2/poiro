@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Highlighter } from "@/components/TextHighlighter";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,24 +15,24 @@ gsap.registerPlugin(ScrollTrigger);
 
 const LAYERS = [
   {
-    label: "Brand Strategy",
-    detail: "The foundation that defines your essence",
+    label: "Content Strategy",
+    detail: "The blueprint that shapes every story",
   },
   {
     label: "Audience Insights",
     detail: "Understanding what truly resonates",
   },
   {
-    label: "Content Marketing",
-    detail: "Crafting messages that move people",
-  },
-  {
-    label: "Consistent Messaging",
-    detail: "Reinforcing your story everywhere",
+    label: "Scripting",
+    detail: "Turning ideas into words that captivate",
   },
   {
     label: "Creative Direction",
-    detail: "Bringing your brand vision to life",
+    detail: "Bringing your vision to life",
+  },
+  {
+    label: "Brand & Product",
+    detail: "Weave in your brand seamlessly",
   },
 ];
 
@@ -41,19 +42,22 @@ export default function LayersSection() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const itemsRef = useRef<HTMLUListElement>(null);
 
+  const [showLayers, setShowLayers] = useState<boolean[]>(new Array(LAYERS.length).fill(false));
+
   useEffect(() => {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      /* ── Video: fade + blur in ── */
+      /* ── Video: fade + scale in (Removed blur for smooth video playback) ── */
       gsap.fromTo(
         videoWrapRef.current,
-        { opacity: 0, filter: "blur(16px)", scale: 0.97 },
+        { opacity: 0, scale: 0.85, y: 30 },
         {
           opacity: 1,
-          filter: "blur(0px)",
           scale: 1,
+          y: 0,
           ease: "none",
+          force3D: true, // Hardware acceleration
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 85%",
@@ -98,6 +102,15 @@ export default function LayersSection() {
                 start: `top ${78 - i * 6}%`,
                 end: `top ${28 - i * 4}%`,
                 scrub: 1,
+                onUpdate: (self) => {
+                  setShowLayers((prev) => {
+                    const isActive = self.progress > 0.3;
+                    if (prev[i] === isActive) return prev;
+                    const next = [...prev];
+                    next[i] = isActive;
+                    return next;
+                  });
+                },
               },
             }
           );
@@ -113,9 +126,9 @@ export default function LayersSection() {
       ref={sectionRef}
       id="layers"
       style={{
-        padding: "160px 48px",
+        padding: "48px 48px 80px", /* Adjusted: Smaller top/bottom padding to reduce gaps, removed negative marginTop */
         background: "var(--color-background)",
-        minHeight: "75vh",
+        minHeight: "55vh",
         display: "flex",
         alignItems: "center",
       }}
@@ -149,6 +162,7 @@ export default function LayersSection() {
               borderRadius: 12,
               overflow: "hidden",
               opacity: 0,
+              transform: "translateZ(0)", // Force GPU layer
             }}
           >
             <video
@@ -157,11 +171,14 @@ export default function LayersSection() {
               loop
               muted
               playsInline
+              preload="auto"
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
                 display: "block",
+                transform: "translateZ(0)",
+                willChange: "transform",
               }}
             />
           </div>
@@ -172,6 +189,7 @@ export default function LayersSection() {
           <h2
             ref={headingRef}
             style={{
+              fontFamily: "var(--font-figtree)",
               fontSize: "clamp(36px, 4vw, 56px)",
               fontWeight: 800,
               letterSpacing: "-0.02em",
@@ -195,7 +213,7 @@ export default function LayersSection() {
               gap: "24px",
             }}
           >
-            {LAYERS.map((layer) => (
+            {LAYERS.map((layer, index) => (
               <li
                 key={layer.label}
                 className="layer-item"
@@ -218,12 +236,18 @@ export default function LayersSection() {
                 />
                 <span
                   style={{
+                    fontFamily: "var(--font-figtree)",
                     fontSize: "clamp(18px, 1.5vw, 22px)",
                     color: "var(--color-foreground)",
                     lineHeight: 1.6,
                   }}
                 >
-                  <strong style={{ fontWeight: 700 }}>{layer.label}:</strong>{" "}
+                  <strong style={{ fontWeight: 700 }}>
+                    <Highlighter show={showLayers[index]} action="underline" color="#ff8015" padding={3}>
+                      {layer.label}
+                    </Highlighter>
+                    :
+                  </strong>{" "}
                   <span style={{ color: "var(--color-light-gray)" }}>
                     {layer.detail}
                   </span>

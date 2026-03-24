@@ -156,6 +156,9 @@ export default function MasonryGallerySection() {
     return () => {
       cancelled = true;
     };
+    // Initialize exactly once; activeTab and specific dependencies are captured 
+    // from mount point on purpose to avoid re-running network preload loops.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -204,10 +207,10 @@ export default function MasonryGallerySection() {
 
   const tabButtonStyle = useMemo(
     () => ({
-      fontFamily: "var(--font-mono)",
-      fontSize: "0.75rem",
-      fontWeight: 700,
-      letterSpacing: "0.12em",
+      fontFamily: "var(--font-figtree)",
+      fontSize: "0.80rem",
+      fontWeight: 600,
+      letterSpacing: "0.15em",
       textTransform: "uppercase" as const,
       border: "1px solid var(--color-border-gray)",
       background: "transparent",
@@ -230,6 +233,23 @@ export default function MasonryGallerySection() {
         paddingRight: "clamp(18px, 4vw, 48px)",
       }}
     >
+      <style>
+        {`
+          @keyframes workTextFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+          }
+          .work-animate-text-flow {
+            background: linear-gradient(to right, #ff8015, #ff5315, #ff8015);
+            background-size: 200% auto;
+            animation: workTextFlow 4s linear infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+          }
+        `}
+      </style>
       <div style={{ maxWidth: 1400, margin: "0 auto", width: "100%" }}>
         <div
           style={{
@@ -237,21 +257,35 @@ export default function MasonryGallerySection() {
             paddingRight: "clamp(6px, 1vw, 14px)",
           }}
         >
-          <p
-            className="text-xs uppercase tracking-[0.35em] text-orange-500 text-center"
-            style={{ margin: 0, paddingTop: "clamp(6px, 0.9vw, 12px)" }}
-          >
-            Gallery Output
-          </p>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <p
+              className="text-xs uppercase tracking-[0.15em] text-white text-center"
+              style={{ 
+                fontFamily: "var(--font-figtree)", 
+                margin: 0, 
+                padding: "8px 24px",
+                paddingTop: "10px", 
+                background: "#ff8015",
+                borderRadius: "9999px",
+                fontWeight: 600,
+                fontSize: "0.80rem",
+                boxShadow: "0 4px 14px rgba(255, 128, 21, 0.4)",
+                display: "inline-block"
+              }}
+            >
+              Gallery Output
+            </p>
+          </div>
           <h2
             className="text-5xl md:text-6xl font-black text-center tracking-tight text-white"
             style={{
+              fontFamily: "var(--font-figtree)",
               marginTop: "clamp(30px, 4vw, 44px)",
               marginBottom: "clamp(26px, 3vw, 38px)",
               paddingBottom: "clamp(4px, 0.7vw, 10px)",
             }}
           >
-            Our Work
+            Our <span className="work-animate-text-flow">Work</span>
           </h2>
         </div>
 

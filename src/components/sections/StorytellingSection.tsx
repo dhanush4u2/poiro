@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Highlighter } from "@/components/TextHighlighter";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,6 +18,10 @@ export default function StorytellingSection() {
   const badgeRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
+
+  const [showH1, setShowH1] = useState(false);
+  const [showH2, setShowH2] = useState(false);
+  const [showH3, setShowH3] = useState(false);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -49,6 +54,13 @@ export default function StorytellingSection() {
             ...trigger,
             start: "top 80%",
             end: "top 25%",
+            onUpdate: (self) => {
+              if (self.progress > 0.4) {
+                setShowH1(true);
+              } else {
+                setShowH1(false);
+              }
+            }
           },
         }
       );
@@ -66,6 +78,19 @@ export default function StorytellingSection() {
             ...trigger,
             start: "top 75%",
             end: "top 20%",
+            onUpdate: (self) => {
+              if (self.progress > 0.5) {
+                setShowH2(true);
+              } else {
+                setShowH2(false);
+              }
+              
+              if (self.progress > 0.8) {
+                setShowH3(true);
+              } else {
+                setShowH3(false);
+              }
+            }
           },
         }
       );
@@ -79,7 +104,7 @@ export default function StorytellingSection() {
       ref={sectionRef}
       id="storytelling"
       style={{
-        padding: "128px 24px",
+        padding: "120px 24px 48px", /* Adjusted: Less bottom padding to reduce gap to LayersSection */
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -100,19 +125,22 @@ export default function StorytellingSection() {
           ref={badgeRef}
           style={{
             display: "inline-block",
-            border: "1px solid var(--color-brand-orange)",
+            background: "#ff8015",
             borderRadius: "999px",
-            padding: "6px 20px",
+            padding: "8px 24px",
             marginBottom: "32px",
             opacity: 0,
+            boxShadow: "0 4px 14px rgba(255, 128, 21, 0.4)",
           }}
         >
           <span
             style={{
-              fontSize: "0.8125rem",
-              color: "var(--color-brand-orange)",
-              letterSpacing: "0.04em",
-              fontWeight: 500,
+              fontFamily: "var(--font-figtree), sans-serif",
+              fontSize: "0.80rem",
+              textTransform: "uppercase",
+              color: "#ffffff",
+              letterSpacing: "0.15em",
+              fontWeight: 600,
             }}
           >
             The Foundation
@@ -123,8 +151,9 @@ export default function StorytellingSection() {
         <h2
           ref={headingRef}
           style={{
+            fontFamily: "var(--font-figtree)",
             fontSize: "clamp(40px, 7vw, 80px)",
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1.05,
             letterSpacing: "-0.02em",
             color: "var(--color-foreground)",
@@ -133,24 +162,25 @@ export default function StorytellingSection() {
             opacity: 0,
           }}
         >
-          Storytelling ≠ Prompting
+          Storytelling = <Highlighter show={showH1} action="crossed-off" color="#ff8015" padding={3} strokeWidth={3}>Prompting</Highlighter>{" "}
         </h2>
 
         {/* Description */}
         <p
           ref={descRef}
           style={{
+            fontFamily: "var(--font-figtree), sans-serif",
             fontSize: "clamp(1rem, 1.5vw, 1.3rem)",
             color: "var(--color-light-gray)",
             lineHeight: 1.7,
-            maxWidth: 640,
+            maxWidth: 800,
             margin: "0 auto",
             opacity: 0,
           }}
         >
           Effective brand storytelling is built in layers, like a well-crafted
           burger. Each element works together to build strong brand identity,
-          drive engagement, and create lasting recall.
+          drive engagement, and create lasting recall. Poiro engineers every layer with precision, so your brand only has to show up with what no one else has: <Highlighter show={showH1} action="underline" color="#ff8015" padding={3} strokeWidth={3}>your secret sauce.</Highlighter>{" "}
         </p>
       </div>
     </section>

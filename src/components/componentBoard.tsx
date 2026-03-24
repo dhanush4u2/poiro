@@ -174,45 +174,11 @@ export function Nav({ onCtaClick }: NavProps) {
           }
         }}
       >
-        <div
-          className={`flex items-center font-black text-brand-orange ${comfortaa.className}`}
-          style={{ fontSize: "1.4rem", letterSpacing: "-0.025em" }}
-        >
-          <span
-            style={{
-              display: "inline-block",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              transformOrigin: "right center",
-              maxWidth: isScrolled ? "0px" : "20px",
-              opacity: isScrolled ? 0 : 1,
-              transform: isScrolled ? "translateX(10px)" : "translateX(0px)",
-              transition: "all 700ms cubic-bezier(0.32, 0.72, 0, 1)",
-            }}
-          >
-            P
-          </span>
-          <span
-            className="inline-block"
-            style={{ position: "relative", zIndex: 10, transition: "transform 500ms ease" }}
-          >
-            ô
-          </span>
-          <span
-            style={{
-              display: "inline-block",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              transformOrigin: "left center",
-              maxWidth: isScrolled ? "0px" : "50px",
-              opacity: isScrolled ? 0 : 1,
-              transform: isScrolled ? "translateX(-10px)" : "translateX(0px)",
-              transition: "all 700ms cubic-bezier(0.32, 0.72, 0, 1)",
-            }}
-          >
-            irō
-          </span>
-        </div>
+        <img 
+          src="/logo.png" 
+          alt="Poiro" 
+          style={{ height: "24px", width: "auto", objectFit: "contain" }}
+        />
       </Link>
 
       <div
@@ -235,6 +201,7 @@ export function Nav({ onCtaClick }: NavProps) {
             href={`#${item.targetId}`}
             className="transition-all duration-200"
             style={{
+              fontFamily: "var(--font-figtree)",
               fontSize: "13px",
               fontWeight: 500,
               color: hoveredLink === item.label ? "#fff" : "rgba(180,180,180,0.8)",
@@ -264,6 +231,7 @@ export function Nav({ onCtaClick }: NavProps) {
           }}
           className="hidden md:flex items-center cursor-pointer transition-all duration-200"
           style={{
+            fontFamily: "var(--font-figtree)",
             fontSize: "12px",
             fontWeight: 700,
             letterSpacing: "0.06em",
