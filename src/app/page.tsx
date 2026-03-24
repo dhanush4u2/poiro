@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import HeroSection from "@/components/HeroSection";
 import HeroCanvas from "@/components/HeroCanvas";
 import { Explosion } from "@/../components/Explosion";
 import OperatingSystemSection from "@/components/sections/OperatingSystemSection";
+import StorytellingSection from "@/components/sections/StorytellingSection";
+import LayersSection from "@/components/sections/LayersSection";
 import SecondVideoSection from "@/components/sections/SecondVideoSection";
 import MasonryGallerySection from "@/components/sections/MasonryGallerySection";
 import BriefCTASection from "@/components/sections/BriefCTASection";
-import FAQSection from "@/components/sections/FAQSection";
 import FooterCTASection from "@/components/sections/FooterCTASection";
 import PagePreloader from "@/../components/PagePreloader";
 import { Nav } from "@/components/componentBoard";
@@ -43,6 +44,14 @@ export default function Home() {
   const [heroReady, setHeroReady] = useState(false);
   const [isSecondVideoActive, setIsSecondVideoActive] = useState(false);
 
+  useEffect(() => {
+    // Force user to start at top on refresh
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
+
   /* ── Hero frames: update hero segment state + explosion ── */
   const handleHeroFrameChange = useCallback((frameIndex: number) => {
     setHeroFrame(frameIndex);
@@ -72,8 +81,7 @@ export default function Home() {
   }, []);
 
   /* ── Overlay opacity based on hero frame ── */
-  // scrolling forward: <280 = 1, 280→300 fade 1→0, >300 = 0
-  // scrolling backward: >320 = 0, 300→280 fade 0→1, <280 = 1
+  // With intro-only hero playback, this stays fully visible through frame 180.
   const overlayOpacity = (() => {
     const frame = heroFrame;
     if (frame < 280) return 1;
@@ -143,10 +151,94 @@ export default function Home() {
             />
           </div>
         )}
+
+        {/* Hero Text Overlay — above particles */}
+        {overlayOpacity > 0 && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+              opacity: overlayOpacity,
+              transition: "opacity 0.15s linear",
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: 896,
+                width: "100%",
+                padding: "0 24px",
+                textAlign: "center",
+                animation: "heroFadeUp 0.6s ease-out both",
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: "clamp(2.5rem, 6vw, 5rem)",
+                  fontWeight: 800,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                  color: "#ffffff",
+                  marginBottom: "16px",
+                  textShadow: "0 2px 32px rgba(0,0,0,0.4)",
+                }}
+              >
+                Engineering Creativity
+              </h1>
+              <p
+                style={{
+                  fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                  color: "rgba(255, 255, 255, 0.9)",
+                  marginBottom: "32px",
+                  fontWeight: 400,
+                  letterSpacing: "0.01em",
+                }}
+              >
+                Where AI Meets Brand Storytelling
+              </p>
+              <a
+                href="#storytelling"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "var(--color-brand-orange)",
+                  color: "#000000",
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  padding: "12px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
+                  pointerEvents: "auto",
+                  transition: "filter 0.2s ease",
+                  letterSpacing: "0.01em",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.filter = "brightness(1.15)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.filter = "brightness(1)")
+                }
+              >
+                Begin your story ↗
+              </a>
+            </div>
+          </div>
+        )}
       </HeroSection>
 
       {/* Logo marquee strip — directly below hero, above OS section */}
       <LogoMarquee />
+
+      {/* Storytelling section */}
+      <StorytellingSection />
+
+      {/* Layers section */}
+      <LayersSection />
 
       {/* Normal sections — stacked naturally */}
       <OperatingSystemSection />
@@ -162,8 +254,6 @@ export default function Home() {
       <MasonryGallerySection />
 
       <BriefCTASection />
-
-      <FAQSection />
 
       {/* Footer section */}
       <FooterCTASection />

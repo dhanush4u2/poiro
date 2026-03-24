@@ -2,24 +2,18 @@
 
 import { useRef, useEffect, useCallback, ReactNode, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "./SmoothScroll";
-import { FRAME_SEGMENTS, PERCENT_PER_FRAME } from "@/../lib/frameSegments";
-
-gsap.registerPlugin(ScrollTrigger);
+import { FRAME_SEGMENTS } from "@/../lib/frameSegments";
 
 /* ═══════════════════════════════════════════════════════
    HERO SECTION — Cinematic Frame-Sequence Controller
-   Phase 1: Auto-play frames start→introEnd (~3s, scroll locked)
-   Phase 2: Scroll-driven frames introEnd→end via ScrollTrigger
+  Auto-play frames start→introEnd (~3s, scroll locked)
 
   This section owns its viewport content and reports
   frame changes via onFrameChange.
    ═══════════════════════════════════════════════════════ */
 
 const HERO = FRAME_SEGMENTS.HERO;
-const SCROLL_FRAMES = HERO.end - HERO.introEnd;
-const SCROLL_DISTANCE = `+=${Math.round(SCROLL_FRAMES * PERCENT_PER_FRAME)}%`;
 
 interface HeroSectionProps {
   onFrameChange?: (frameIndex: number) => void;
@@ -75,27 +69,7 @@ export default function HeroSection({ onFrameChange, framesLoaded, onIntroComple
         introCompleteRef.current = true;
         document.documentElement.classList.remove("scroll-locked");
         startScroll();
-
-        /* ── Phase 2: Scroll-driven ── */
-        if (!sectionRef.current) return;
-
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: "top top",
-          end: SCROLL_DISTANCE,
-          pin: true,
-          scrub: 1,
-          onUpdate: (self) => {
-            const idx =
-              HERO.introEnd +
-              Math.floor(self.progress * SCROLL_FRAMES);
-            setFrameIndex(idx);
-          },
-          onLeave: () => onActiveChange?.(false),
-          onEnterBack: () => onActiveChange?.(true),
-        });
-
-        ScrollTrigger.refresh();
+        onActiveChange?.(false);
         onIntroComplete?.();
       },
     });
@@ -103,11 +77,7 @@ export default function HeroSection({ onFrameChange, framesLoaded, onIntroComple
 
   /* ── Cleanup ── */
   useEffect(() => {
-    const el = sectionRef.current;
     return () => {
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === el) st.kill();
-      });
       document.documentElement.classList.remove("scroll-locked");
     };
   }, []);

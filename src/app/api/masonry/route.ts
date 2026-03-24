@@ -33,12 +33,27 @@ export async function GET(request: Request) {
     const dirPath = path.join(process.cwd(), "public", folder);
     const files = await fs.readdir(dirPath, { withFileTypes: true });
 
-    const media: MediaItem[] = files
+    const fileNames = files
       .filter((entry) => entry.isFile())
       .map((entry) => entry.name)
       .filter((name) => {
         const ext = path.extname(name).toLowerCase();
         return IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext);
+      });
+
+    const videoBaseNames = new Set(
+      fileNames
+        .filter((name) => VIDEO_EXTENSIONS.has(path.extname(name).toLowerCase()))
+        .map((name) => path.basename(name, path.extname(name)).toLowerCase())
+    );
+
+    const media: MediaItem[] = fileNames
+      .filter((name) => {
+        const ext = path.extname(name).toLowerCase();
+        if (!IMAGE_EXTENSIONS.has(ext)) return true;
+
+        const baseName = path.basename(name, ext).toLowerCase();
+        return !videoBaseNames.has(baseName);
       })
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
       .slice(0, MAX_MEDIA)

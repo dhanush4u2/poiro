@@ -26,7 +26,7 @@ const LOGOS = [
   { name: "Imara", src: "/logos/imara.webp" },
 ];
 
-const SCROLL_SPEED_PX_PER_SEC = 70;
+const SCROLL_SPEED_PX_PER_SEC = 40;
 
 export default function LogoMarquee() {
   const sequenceRef = useRef<HTMLDivElement | null>(null);
@@ -68,120 +68,156 @@ export default function LogoMarquee() {
   const rowStyle = {
     display: "flex",
     alignItems: "center",
-    minHeight: "clamp(64px, 8vw, 88px)",
+    minHeight: "clamp(60px, 7vw, 80px)",
     width: "max-content",
   } as const;
 
   return (
     <div
       style={{
-        position: "relative",
         width: "100%",
-        background: "#000",
-        borderTop: "1px solid var(--color-border-gray)",
-        borderBottom: "1px solid var(--color-border-gray)",
-        minHeight: "clamp(120px, 14vw, 168px)",
-        padding: "clamp(26px, 3.6vw, 38px) 0",
-        overflow: "hidden",
+        padding: "clamp(90px, 12vw, 150px) clamp(18px, 4vw, 48px) clamp(44px, 6vw, 72px)",
       }}
     >
-      {/* Left fade */}
       <div
         style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "80px",
-          height: "100%",
-          background: "linear-gradient(to right, #000, transparent)",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Right fade */}
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          width: "80px",
-          height: "100%",
-          background: "linear-gradient(to left, #000, transparent)",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
-
-      <motion.div
-        style={{
-          x,
-          display: "flex",
-          width: "max-content",
-          alignItems: "center",
-          willChange: "transform",
+          maxWidth: 1024,
+          margin: "0 auto",
+          width: "100%",
         }}
       >
-        <div ref={sequenceRef} style={rowStyle}>
-          {LOGOS.map((logo, index) => (
-            <div
-              key={`${logo.name}-main-${index}`}
-              style={{
-                padding: "0 clamp(20px, 2.8vw, 42px)",
-                flexShrink: 0,
-                width: "clamp(130px, 14vw, 220px)",
-                height: "clamp(46px, 5.6vw, 76px)",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                src={logo.src}
-                alt={logo.name}
-                fill
-                sizes="(max-width: 768px) 140px, 220px"
-                style={{
-                  objectFit: "contain",
-                  filter: "grayscale(1)",
-                  opacity: 0.78,
-                }}
-              />
-            </div>
-          ))}
-        </div>
+        <h2
+          style={{
+            margin: 0,
+            textAlign: "center",
+            fontSize: "clamp(14px, 1.5vw, 24px)",
+            lineHeight: 1.2,
+            letterSpacing: "0.01em",
+            fontWeight: 700,
+            color: "#fff",
+          }}
+        >
+          Brands We&apos;ve Worked With
+        </h2>
 
-        <div aria-hidden="true" style={rowStyle}>
-          {LOGOS.map((logo, index) => (
-            <div
-              key={`${logo.name}-dup-${index}`}
-              style={{
-                padding: "0 clamp(20px, 2.8vw, 42px)",
-                flexShrink: 0,
-                width: "clamp(130px, 14vw, 220px)",
-                height: "clamp(46px, 5.6vw, 76px)",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                src={logo.src}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 140px, 220px"
-                style={{
-                  objectFit: "contain",
-                  filter: "grayscale(1)",
-                  opacity: 0.78,
-                }}
-              />
+        <div
+          style={{
+            marginTop: "clamp(30px, 4vw, 48px)",
+            borderRadius: "14px",
+            background: "rgba(255,255,255,0.02)",
+            padding: "clamp(20px, 3vw, 32px) 0",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: "56px",
+              height: "100%",
+              background: "linear-gradient(to right, #000, transparent)",
+              zIndex: 1,
+              pointerEvents: "none",
+            }}
+          />
+
+          <div
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              width: "56px",
+              height: "100%",
+              background: "linear-gradient(to left, #000, transparent)",
+              zIndex: 1,
+              pointerEvents: "none",
+            }}
+          />
+
+          <motion.div
+            style={{
+              x,
+              display: "flex",
+              width: "max-content",
+              alignItems: "center",
+              willChange: "transform",
+            }}
+          >
+            <div ref={sequenceRef} style={rowStyle}>
+              {LOGOS.map((logo, index) => (
+                <div
+                  key={`${logo.name}-main-${index}`}
+                  style={{
+                    padding: "0 clamp(24px, 3vw, 40px)",
+                    flexShrink: 0,
+                    width: "clamp(200px, 20vw, 260px)",
+                    height: "clamp(50px, 6vw, 70px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Image
+                    src={logo.src}
+                    alt={logo.name}
+                    width={260}
+                    height={70}
+                    sizes="(max-width: 768px) 200px, 260px"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      filter: "brightness(0) saturate(100%) invert(100%)",
+                      opacity: 0.6,
+                      transition: "opacity 0.25s ease",
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.opacity = "0.9";
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.opacity = "0.6";
+                    }}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+
+            <div aria-hidden="true" style={rowStyle}>
+              {LOGOS.map((logo, index) => (
+                <div
+                  key={`${logo.name}-dup-${index}`}
+                  style={{
+                    padding: "0 clamp(24px, 3vw, 40px)",
+                    flexShrink: 0,
+                    width: "clamp(200px, 20vw, 260px)",
+                    height: "clamp(50px, 6vw, 70px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Image
+                    src={logo.src}
+                    alt={logo.name}
+                    width={260}
+                    height={70}
+                    sizes="(max-width: 768px) 200px, 260px"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      filter: "brightness(0) saturate(100%) invert(100%)",
+                      opacity: 0.6,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

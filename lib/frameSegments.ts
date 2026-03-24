@@ -9,7 +9,7 @@ export const FRAME_SEGMENTS = {
     /** First frame of the hero video */
     start: 0,
     /** Last frame of the hero video (0-indexed, inclusive) */
-    end: 716,
+    end: 180,
     /** Frames auto-played before scroll takes over */
     introEnd: 180,
     /** Duration of the auto-play intro in seconds */
@@ -21,9 +21,9 @@ export const FRAME_SEGMENTS = {
   },
   SECOND_VIDEO: {
     /** First frame of the second video segment */
-    start: 720,
+    start: 181,
     /** Last frame of the second video segment */
-    end: 900,
+    end: 360,
   },
 } as const;
 

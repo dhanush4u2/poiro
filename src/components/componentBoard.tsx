@@ -226,9 +226,9 @@ export function Nav({ onCtaClick }: NavProps) {
         }}
       >
         {[
-          { label: "System", targetId: "operating-system" },
-          { label: "Gallery", targetId: "masonry-gallery" },
-          { label: "FAQ", targetId: "faq" },
+          { label: "Storytelling OS", targetId: "operating-system" },
+          { label: "Our Work", targetId: "masonry-gallery" },
+          { label: "Try Us", targetId: "second-video" },
         ].map((item) => (
           <a
             key={item.label}

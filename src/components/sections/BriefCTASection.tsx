@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Montserrat } from "next/font/google";
+import { Figtree } from "next/font/google";
 
-const montserrat = Montserrat({
+const figtree = Figtree({
   subsets: ["latin"],
   weight: ["700", "900"],
   display: "swap",
@@ -309,7 +309,6 @@ function BriefCTASection() {
       className="relative w-full bg-[#020202] text-white overflow-hidden"
       style={{
         padding: "clamp(110px, 13vw, 190px) var(--space-3)",
-        minHeight: "clamp(980px, 105vw, 1420px)",
         display: "flex",
         justifyContent: "center",
       }}
@@ -483,20 +482,20 @@ function BriefCTASection() {
           className="w-full text-center"
           style={{ maxWidth: 1120, margin: "0 auto", marginBottom: "clamp(28px, 4vw, 56px)" }}
         >
-          <h2 className={`text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter ${montserrat.className}`}>
+          <h2 className={`text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter ${figtree.className}`}>
             Don't <span className="brief-animate-text-flow">believe</span> us?
           </h2>
           <h4
             style={{
-              marginTop: "clamp(18px, 2.4vw, 30px)",
-              fontSize: "clamp(18px, 2vw, 26px)",
+              marginTop: "clamp(15px, 2.4vw, 15px)",
+              fontSize: "clamp(14px, 2vw, 24px)",
               lineHeight: 1.45,
               fontWeight: 600,
               color: "#c6c6c6",
               letterSpacing: "0.01em",
             }}
           >
-            Share your Brief & we’ll come back with a <br />structured approach and a clear content direction
+            Send Us Your Idea & We'll Bring It To Life.
           </h4>
         </div>
 
@@ -504,7 +503,7 @@ function BriefCTASection() {
           onClick={handleUploadClick}
           onMouseEnter={() => uploadState === "idle" && setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className={`relative w-full max-w-[1120px] mx-auto mb-24 md:mb-32 rounded-[2rem] transition-all duration-700 flex flex-col items-center justify-center px-6 md:px-8 py-16 md:py-20 ${
+          className={`relative w-full max-w-[1120px] mx-auto rounded-[2rem] transition-all duration-700 flex flex-col items-center justify-center px-6 md:px-8 py-16 md:py-20 ${
             uploadState === "idle"
               ? "bg-[#050505]/30 hover:bg-[#ff8015]/[0.02] cursor-pointer group shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]"
               : uploadState === "uploading"
@@ -676,6 +675,8 @@ function BriefCTASection() {
           <p className="mt-4 text-sm text-red-400 font-mono tracking-wide">{uploadMessage}</p>
         )}
 
+        {/* --- TIMELINE COMPONENT TEMPORARILY COMMENTED OUT --- */}
+        {false && (
         <div
           className="relative w-full max-w-[1220px] mx-auto"
           style={{ marginTop: "clamp(100px, 9vw, 140px)" }}
@@ -719,7 +720,7 @@ function BriefCTASection() {
                         className="opacity-0 brief-anim-text-down flex flex-col items-center text-center"
                         style={{ animationDelay: `${reachTime + 0.2}s` }}
                       >
-                        <h3 className={`text-[18px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${montserrat.className}`}>
+                        <h3 className={`text-[18px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${figtree.className}`}>
                           {item.title}
                         </h3>
                         <p className="text-[15px] text-[#999] leading-relaxed font-normal">
@@ -745,7 +746,7 @@ function BriefCTASection() {
                         className="opacity-0 brief-anim-text-up flex flex-col items-center text-center"
                         style={{ animationDelay: `${reachTime + 0.2}s` }}
                       >
-                        <h3 className={`text-[18px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${montserrat.className}`}>
+                        <h3 className={`text-[18px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${figtree.className}`}>
                           {item.title}
                         </h3>
                         <p className="text-[15px] text-[#999] leading-relaxed font-normal">
@@ -786,7 +787,7 @@ function BriefCTASection() {
                     className="w-full pl-[96px] pr-4 opacity-0 brief-anim-text-up pt-1"
                     style={{ animationDelay: `${reachTime + 0.2}s` }}
                   >
-                    <h3 className={`text-[20px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${montserrat.className}`}>
+                    <h3 className={`text-[20px] font-bold text-white tracking-wide mb-2 leading-tight transition-colors duration-300 group-hover:text-[#ff8015] ${figtree.className}`}>
                       {item.title}
                     </h3>
                     <p className="text-[15px] text-[#999] leading-relaxed font-normal">{item.desc}</p>
@@ -796,6 +797,8 @@ function BriefCTASection() {
             })}
           </div>
         </div>
+        )}
+        {/* --- END TIMELINE COMPONENT --- */}
       </div>
 
       {isModalOpen && (
@@ -809,7 +812,7 @@ function BriefCTASection() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="brief-modal-header">
-              <h3 className={`text-2xl font-black tracking-tight text-white ${montserrat.className}`}>
+              <h3 className={`text-2xl font-black tracking-tight text-white ${figtree.className}`}>
                 Upload Brief
               </h3>
               <button

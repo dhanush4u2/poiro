@@ -28,6 +28,12 @@ interface MasonryProps {
   animationKey?: number;
 }
 
+const VIDEO_PREVIEW_FALLBACK =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><rect width="16" height="9" fill="#151515"/><path d="M6 3.2v2.6L9.2 4.5z" fill="#8a8a8a"/></svg>'
+  );
+
 function useMedia(queries: string[], values: number[], defaultValue: number) {
   const get = () => {
     const index = queries.findIndex((query) => window.matchMedia(query).matches);
@@ -52,17 +58,39 @@ function useMedia(queries: string[], values: number[], defaultValue: number) {
 function useMeasure<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const frameRef = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     if (!ref.current) return;
 
-    const resizeObserver = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      setSize({ width, height });
+    const update = () => {
+      if (!ref.current) return;
+      const { width, height } = ref.current.getBoundingClientRect();
+      setSize((prev) => {
+        if (prev.width === width && prev.height === height) return prev;
+        return { width, height };
+      });
+    };
+
+    update();
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (frameRef.current !== null) return;
+
+      frameRef.current = requestAnimationFrame(() => {
+        frameRef.current = null;
+        update();
+      });
     });
 
     resizeObserver.observe(ref.current);
-    return () => resizeObserver.disconnect();
+
+    return () => {
+      resizeObserver.disconnect();
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
   }, []);
 
   return [ref, size] as const;
@@ -71,7 +99,7 @@ function useMeasure<T extends HTMLElement>() {
 export default function Masonry({
   items,
   ease = "power3.out",
-  duration = 0.4,
+  duration = 0.6,
   stagger = 0.05,
   animateFrom = "bottom",
   gap = "clamp(16px, 2vw, 24px)",
@@ -84,9 +112,29 @@ export default function Masonry({
   const columns = useMedia(["(min-width: 1024px)", "(min-width: 640px)"], [4, 3], 2);
 
   const [containerRef, { width }] = useMeasure<HTMLDivElement>();
-  const [imagesReady, setImagesReady] = useState(false);
-  const [playableVideoIds, setPlayableVideoIds] = useState<Set<string>>(new Set());
+  const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
+  const [videoPlayingById, setVideoPlayingById] = useState<Record<string, boolean>>({});
+  const [previewSrcById, setPreviewSrcById] = useState<Record<string, string>>({});
+  const previewAvailabilityCacheRef = useRef<Record<string, boolean>>({});
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+
+  const getVideoPreviewSrc = (videoSrc: string) =>
+    videoSrc.replace(/\.(webm|mp4|mov|m4v)(\?.*)?$/i, ".webp$2");
+
+  const checkPreviewExists = async (previewSrc: string) => {
+    const cached = previewAvailabilityCacheRef.current[previewSrc];
+    if (typeof cached === "boolean") return cached;
+
+    try {
+      const response = await fetch(previewSrc, { method: "HEAD" });
+      const exists = response.ok;
+      previewAvailabilityCacheRef.current[previewSrc] = exists;
+      return exists;
+    } catch {
+      previewAvailabilityCacheRef.current[previewSrc] = false;
+      return false;
+    }
+  };
 
   const getInitialPosition = (
     item: MasonryItem & { x: number; y: number; w: number; h: number }
@@ -120,70 +168,50 @@ export default function Masonry({
   };
 
   useEffect(() => {
-    setImagesReady(false);
-    const raf = requestAnimationFrame(() => setImagesReady(true));
-    return () => cancelAnimationFrame(raf);
-  }, [items, animationKey]);
+    Object.values(videoRefs.current).forEach((video) => {
+      if (!video) return;
+      video.pause();
+      video.currentTime = 0;
+    });
+
+    setHoveredVideoId(null);
+    setVideoPlayingById({});
+    videoRefs.current = {};
+  }, [items]);
 
   useEffect(() => {
     let cancelled = false;
-    setPlayableVideoIds(new Set());
 
     const videoItems = items.filter((item) => item.type === "video");
-    if (!videoItems.length) return;
 
-    const warmAndPlayOneVideo = (id: string) =>
-      new Promise<void>((resolve) => {
-        const video = videoRefs.current[id];
-        if (!video) {
-          resolve();
-          return;
-        }
+    if (!videoItems.length) {
+      setPreviewSrcById({});
+      return;
+    }
 
-        let settled = false;
+    setPreviewSrcById((prev) => {
+      const next: Record<string, string> = {};
+      for (const item of videoItems) {
+        next[item.id] = prev[item.id] ?? VIDEO_PREVIEW_FALLBACK;
+      }
+      return next;
+    });
 
-        const finish = () => {
-          if (settled) return;
-          settled = true;
-          resolve();
-        };
-
-        video.preload = "auto";
-        video.muted = true;
-        video.playsInline = true;
-        video.oncanplaythrough = finish;
-        video.onloadeddata = finish;
-        video.onerror = finish;
-        setTimeout(finish, 7000);
-        video.load();
-      });
-
-    const queue = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
+    const resolvePreviews = async () => {
       for (const item of videoItems) {
         if (cancelled) return;
-        await warmAndPlayOneVideo(item.id);
+        const previewSrc = getVideoPreviewSrc(item.src);
+        const exists = await checkPreviewExists(previewSrc);
         if (cancelled) return;
 
-        const mountedVideo = videoRefs.current[item.id];
-        if (mountedVideo) {
-          try {
-            await mountedVideo.play();
-          } catch {
-            // Ignore autoplay rejections; preview frame is still shown.
-          }
-        }
-
-        setPlayableVideoIds((prev) => {
-          const next = new Set(prev);
-          next.add(item.id);
-          return next;
-        });
+        setPreviewSrcById((prev) => ({
+          ...prev,
+          [item.id]: exists ? previewSrc : VIDEO_PREVIEW_FALLBACK,
+        }));
       }
     };
 
-    void queue();
+    void resolvePreviews();
 
     return () => {
       cancelled = true;
@@ -191,7 +219,9 @@ export default function Masonry({
   }, [items]);
 
   const grid = useMemo(() => {
-    if (!width) return [] as Array<MasonryItem & { x: number; y: number; w: number; h: number }>;
+    if (!width || width < 100) {
+      return [] as Array<MasonryItem & { x: number; y: number; w: number; h: number }>;
+    }
 
     const colHeights = new Array(columns).fill(0);
     const columnWidth = width / columns;
@@ -218,18 +248,20 @@ export default function Masonry({
   const lastAnimationKey = useRef(animationKey);
 
   useLayoutEffect(() => {
-    if (!imagesReady) return;
+    if (!containerRef.current || !grid.length) return;
+
+    const shouldPlayEntrance = !hasMounted.current || animationKey !== lastAnimationKey.current;
 
     grid.forEach((item, index) => {
-      const selector = `[data-key=\"${item.id}\"]`;
+      const el = containerRef.current?.querySelector<HTMLElement>(`[data-key="${item.id}"]`);
+      if (!el) return;
+
       const animationProps = {
         x: item.x,
         y: item.y,
         width: item.w,
         height: item.h,
       };
-
-      const shouldPlayEntrance = !hasMounted.current || animationKey !== lastAnimationKey.current;
 
       if (shouldPlayEntrance) {
         const initialPos = getInitialPosition(item);
@@ -239,39 +271,45 @@ export default function Masonry({
           y: initialPos.y,
           width: item.w,
           height: item.h,
-          ...(blurToFocus ? { filter: "blur(10px)" } : {}),
+          ...(blurToFocus && { filter: "blur(10px)" }),
         };
 
-        gsap.fromTo(selector, initialState, {
+        gsap.fromTo(el, initialState, {
           opacity: 1,
           ...animationProps,
-          ...(blurToFocus ? { filter: "blur(0px)" } : {}),
-          duration: 0.8,
-          ease: "power3.out",
+          ...(blurToFocus && { filter: "blur(0px)" }),
+          duration: duration,
+          ease: ease,
           delay: index * stagger,
         });
       } else {
-        // Keep non-entrance layout corrections instant to avoid visible reslide jitter.
-        gsap.set(selector, {
+        gsap.to(el, {
           ...animationProps,
+          opacity: 1,
+          ...(blurToFocus && { filter: "blur(0px)" }),
+          duration: duration,
+          ease: ease,
+          overwrite: "auto",
         });
       }
     });
 
     hasMounted.current = true;
     lastAnimationKey.current = animationKey;
-  }, [grid, imagesReady, stagger, animateFrom, blurToFocus, duration, ease, animationKey]);
+  }, [grid, stagger, animateFrom, blurToFocus, duration, ease, animationKey]);
 
-  const handleMouseEnter = (
-    event: React.MouseEvent<HTMLDivElement>,
-    item: MasonryItem
-  ) => {
+  const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement>, item: MasonryItem) => {
     const element = event.currentTarget;
-    const selector = `[data-key=\"${item.id}\"]`;
+
+    if (item.type === "video") {
+      setHoveredVideoId(item.id);
+      setVideoPlayingById((prev) => ({ ...prev, [item.id]: false }));
+    }
 
     if (scaleOnHover) {
-      gsap.to(selector, {
+      gsap.to(element, {
         scale: hoverScale,
+        force3D: true,
         duration: 0.3,
         ease: "power2.out",
       });
@@ -285,16 +323,23 @@ export default function Masonry({
     }
   };
 
-  const handleMouseLeave = (
-    event: React.MouseEvent<HTMLDivElement>,
-    item: MasonryItem
-  ) => {
+  const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>, item: MasonryItem) => {
     const element = event.currentTarget;
-    const selector = `[data-key=\"${item.id}\"]`;
+
+    if (item.type === "video") {
+      const video = videoRefs.current[item.id];
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+      setVideoPlayingById((prev) => ({ ...prev, [item.id]: false }));
+      setHoveredVideoId((current) => (current === item.id ? null : current));
+    }
 
     if (scaleOnHover) {
-      gsap.to(selector, {
+      gsap.to(element, {
         scale: 1,
+        force3D: true,
         duration: 0.3,
         ease: "power2.out",
       });
@@ -313,6 +358,7 @@ export default function Masonry({
       ref={containerRef}
       className="list"
       style={{
+        position: "relative",
         height: maxHeight ? `${maxHeight}px` : "320px",
         ["--masonry-gap" as string]: gap,
       }}
@@ -326,25 +372,62 @@ export default function Masonry({
           onMouseEnter={(event) => handleMouseEnter(event, item)}
           onMouseLeave={(event) => handleMouseLeave(event, item)}
         >
+          {(() => {
+            const isActiveVideoTile = hoveredVideoId === item.id;
+            const isVideoPlaying = videoPlayingById[item.id] === true;
+            const shouldHidePreview = isActiveVideoTile && isVideoPlaying;
+
+            return (
           <div className="item-img">
             {item.type === "video" ? (
-              <video
-                ref={(el) => {
-                  videoRefs.current[item.id] = el;
-                }}
-                src={item.src}
-                autoPlay={playableVideoIds.has(item.id)}
-                muted
-                loop
-                playsInline
-                preload={playableVideoIds.has(item.id) ? "auto" : "metadata"}
-                onLoadedData={(event) => {
-                  if (!playableVideoIds.has(item.id)) {
-                    event.currentTarget.pause();
-                  }
-                }}
-                className="h-full w-full object-cover"
-              />
+              <>
+                {hoveredVideoId === item.id && (
+                  <video
+                    ref={(node) => {
+                      videoRefs.current[item.id] = node;
+                    }}
+                    src={item.src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    onPlaying={() => {
+                      setVideoPlayingById((prev) => ({ ...prev, [item.id]: true }));
+                    }}
+                    className="h-full w-full object-cover"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      zIndex: 0,
+                    }}
+                  />
+                )}
+                <Image
+                  src={previewSrcById[item.id] ?? VIDEO_PREVIEW_FALLBACK}
+                  alt="Masonry video preview"
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    zIndex: 1,
+                    opacity: shouldHidePreview ? 0 : 1,
+                    transition:
+                      hoveredVideoId === item.id
+                        ? "opacity 0.25s ease-out"
+                        : "opacity 0s linear",
+                  }}
+                  onError={() => {
+                    setPreviewSrcById((prev) => {
+                      if (prev[item.id] === VIDEO_PREVIEW_FALLBACK) return prev;
+                      return { ...prev, [item.id]: VIDEO_PREVIEW_FALLBACK };
+                    });
+                  }}
+                />
+              </>
             ) : (
               <Image
                 src={item.src}
@@ -357,6 +440,8 @@ export default function Masonry({
             )}
             {colorShiftOnHover && <div className="color-overlay" />}
           </div>
+            );
+          })()}
         </div>
       ))}
     </div>

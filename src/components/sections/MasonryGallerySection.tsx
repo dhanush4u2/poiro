@@ -22,10 +22,6 @@ type MasonryApiResponse = {
   }>;
 };
 
-type PrecomputeOptions = {
-  eagerVideo: boolean;
-};
-
 function hashToUnit(seed: string): number {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
@@ -54,39 +50,14 @@ function mapDisplayAspect(sourceAspect: number, seed: string): number {
 }
 
 async function precomputeMedia(
-  items: MasonryItem[],
-  options: PrecomputeOptions = { eagerVideo: true }
+  items: MasonryItem[]
 ): Promise<MasonryItem[]> {
   return Promise.all(
     items.map(
       (item) =>
         new Promise<MasonryItem>((resolve) => {
           if (item.type === "video") {
-            const video = document.createElement("video");
-            let settled = false;
-            const finish = () => {
-              if (settled) return;
-              settled = true;
-              const ratio = video.videoWidth > 0 && video.videoHeight > 0
-                ? video.videoWidth / video.videoHeight
-                : 9 / 16;
-              video.removeAttribute("src");
-              video.load();
-              resolve({ ...item, aspectRatio: mapDisplayAspect(ratio, item.id) });
-            };
-
-            video.preload = options.eagerVideo ? "auto" : "metadata";
-            video.muted = true;
-            video.playsInline = true;
-            video.src = item.src;
-            if (options.eagerVideo) {
-              video.oncanplaythrough = finish;
-              video.onloadeddata = finish;
-            }
-            video.onloadedmetadata = finish;
-            video.onerror = finish;
-            setTimeout(finish, options.eagerVideo ? 8000 : 2500);
-            video.load();
+            resolve({ ...item, aspectRatio: 9 / 16 });
             return;
           }
 
@@ -129,6 +100,7 @@ async function loadCategoryItems(folder: string): Promise<MasonryItem[]> {
 
 export default function MasonryGallerySection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const hasBootstrapped = useRef(false);
   const [activeTab, setActiveTab] = useState<TabConfig>(TABS[0]);
   const [items, setItems] = useState<MasonryItem[]>([]);
   const [itemsByFolder, setItemsByFolder] = useState<Record<string, MasonryItem[]>>({});
@@ -137,11 +109,14 @@ export default function MasonryGallerySection() {
   const [animationCycle, setAnimationCycle] = useState(0);
 
   useEffect(() => {
+    if (hasBootstrapped.current) return;
+    hasBootstrapped.current = true;
+
     let cancelled = false;
 
     const bootstrap = async () => {
       const activeLoaded = await loadCategoryItems(activeTab.folder);
-      const activePrecomputed = await precomputeMedia(activeLoaded, { eagerVideo: false });
+      const activePrecomputed = await precomputeMedia(activeLoaded);
 
       if (cancelled) return;
 
@@ -154,7 +129,7 @@ export default function MasonryGallerySection() {
         for (const tab of TABS) {
           if (cancelled || tab.folder === activeTab.folder) continue;
           const loaded = await loadCategoryItems(tab.folder);
-          const precomputed = await precomputeMedia(loaded, { eagerVideo: false });
+          const precomputed = await precomputeMedia(loaded);
           if (cancelled) return;
           setItemsByFolder((prev) => ({
             ...prev,
@@ -219,7 +194,7 @@ export default function MasonryGallerySection() {
     }
 
     const loaded = await loadCategoryItems(tab.folder);
-    const precomputed = await precomputeMedia(loaded, { eagerVideo: false });
+    const precomputed = await precomputeMedia(loaded);
     setItemsByFolder((prev) => ({ ...prev, [tab.folder]: precomputed }));
     setItems(precomputed);
     setActiveTab(tab);
@@ -276,7 +251,7 @@ export default function MasonryGallerySection() {
               paddingBottom: "clamp(4px, 0.7vw, 10px)",
             }}
           >
-            Creative Output Engine
+            Our Work
           </h2>
         </div>
 
