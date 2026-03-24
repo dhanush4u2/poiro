@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import Image from "next/image";
 
@@ -136,7 +136,7 @@ export default function Masonry({
     }
   };
 
-  const getInitialPosition = (
+  const getInitialPosition = useCallback((
     item: MasonryItem & { x: number; y: number; w: number; h: number }
   ) => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -165,7 +165,7 @@ export default function Masonry({
       default:
         return { x: item.x, y: item.y + 100 };
     }
-  };
+  }, [animateFrom, containerRef]);
 
   useEffect(() => {
     Object.values(videoRefs.current).forEach((video) => {
@@ -174,9 +174,18 @@ export default function Masonry({
       video.currentTime = 0;
     });
 
-    setHoveredVideoId(null);
-    setVideoPlayingById({});
-    videoRefs.current = {};
+    // Instead of using setState immediately here on mount/update,
+    // we manage cleanups where relevant based on item changes natively 
+    // or through unmounts. However, state resets are safer deferred
+    // or managed when the tab changes instead of strictly effect-based here.
+    
+    // Defer state updates to avoid React unroll warning:
+    const raf = requestAnimationFrame(() => {
+      setHoveredVideoId(null);
+      setVideoPlayingById({});
+      videoRefs.current = {};
+    });
+    return () => cancelAnimationFrame(raf);
   }, [items]);
 
   useEffect(() => {
@@ -185,16 +194,20 @@ export default function Masonry({
     const videoItems = items.filter((item) => item.type === "video");
 
     if (!videoItems.length) {
-      setPreviewSrcById({});
-      return;
+      // Defer state setter 
+      const raf = requestAnimationFrame(() => setPreviewSrcById({}));
+      return () => cancelAnimationFrame(raf);
     }
 
-    setPreviewSrcById((prev) => {
-      const next: Record<string, string> = {};
-      for (const item of videoItems) {
-        next[item.id] = prev[item.id] ?? VIDEO_PREVIEW_FALLBACK;
-      }
-      return next;
+    // Defer state setter to avoid cascading render linting errors
+    const raf = requestAnimationFrame(() => {
+      setPreviewSrcById((prev) => {
+        const next: Record<string, string> = {};
+        for (const item of videoItems) {
+          next[item.id] = prev[item.id] ?? VIDEO_PREVIEW_FALLBACK;
+        }
+        return next;
+      });
     });
 
     const resolvePreviews = async () => {
@@ -215,6 +228,7 @@ export default function Masonry({
 
     return () => {
       cancelled = true;
+      cancelAnimationFrame(raf);
     };
   }, [items]);
 
@@ -296,7 +310,7 @@ export default function Masonry({
 
     hasMounted.current = true;
     lastAnimationKey.current = animationKey;
-  }, [grid, stagger, animateFrom, blurToFocus, duration, ease, animationKey]);
+  }, [grid, stagger, blurToFocus, duration, ease, animationKey, getInitialPosition, containerRef]);
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement>, item: MasonryItem) => {
     const element = event.currentTarget;

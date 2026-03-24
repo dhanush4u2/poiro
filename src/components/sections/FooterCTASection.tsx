@@ -5,7 +5,6 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CRTScreen } from "@/../components/CRTScreen";
-import ImagesBadgeDemo from "@/../components/images-badge-demo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -173,6 +172,7 @@ export default function FooterCTASection() {
           <h3
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[0.95]"
             style={{
+              fontFamily: "var(--font-figtree)",
               margin: 0,
               color: "#ffffff",
               textWrap: "balance",
@@ -213,15 +213,15 @@ export default function FooterCTASection() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
             <Image
-              src="/o_logo.png"
-              alt="Poiro"
-              width={20}
+              src="/logo.png"
+              alt="Poiro Logo"
+              width={60}
               height={20}
-              style={{ opacity: 0.7 }}
+              style={{ objectFit: "contain", opacity: 0.9 }}
             />
             <span
               style={{
-                fontFamily: "var(--font-mono)",
+                fontFamily: "var(--font-figtree), sans-serif",
                 fontSize: "0.7rem",
                 fontWeight: 600,
                 color: "var(--color-border-gray)",
@@ -239,7 +239,7 @@ export default function FooterCTASection() {
                 key={link}
                 href="#"
                 style={{
-                  fontFamily: "var(--font-mono)",
+                  fontFamily: "var(--font-figtree), sans-serif",
                   fontSize: "0.7rem",
                   fontWeight: 600,
                   color: "var(--color-dark-gray)",

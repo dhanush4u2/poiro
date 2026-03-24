@@ -125,7 +125,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Particles — above light rays */}
+        Particles — above light rays
         {overlayOpacity > 0 && (
           <div
             style={{
@@ -178,8 +178,9 @@ export default function Home() {
             >
               <h1
                 style={{
-                  fontSize: "clamp(2.5rem, 6vw, 5rem)",
-                  fontWeight: 800,
+                  fontFamily: "var(--font-figtree)",
+                  fontSize: "clamp(4rem, 8vw, 5rem)",
+                  fontWeight: 600,
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
                   color: "#ffffff",
@@ -191,6 +192,7 @@ export default function Home() {
               </h1>
               <p
                 style={{
+                  fontFamily: "var(--font-figtree)",
                   fontSize: "clamp(1rem, 2vw, 1.25rem)",
                   color: "rgba(255, 255, 255, 0.9)",
                   marginBottom: "32px",
@@ -203,6 +205,7 @@ export default function Home() {
               <a
                 href="#storytelling"
                 style={{
+                  fontFamily: "var(--font-figtree)",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",

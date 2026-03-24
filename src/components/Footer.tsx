@@ -31,8 +31,8 @@ export default function Footer() {
           </span>
           <span
             style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.8125rem",
+              fontFamily: "var(--font-figtree), sans-serif",
+              fontSize: "0.85rem",
               color: "var(--color-light-gray)",
             }}
           >
@@ -55,21 +55,15 @@ export default function Footer() {
         >
           {/* Left — Branding */}
           <div>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: 900,
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                marginBottom: "var(--space-1)",
-              }}
-            >
-              POIRO
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Poiro Logo" 
+              style={{ height: "32px", width: "auto", marginBottom: "var(--space-1)", objectFit: "contain" }}
+            />
             <p
               style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.75rem",
+                fontFamily: "var(--font-figtree), sans-serif",
+                fontSize: "0.80rem",
                 color: "var(--color-dark-gray)",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
@@ -93,8 +87,9 @@ export default function Footer() {
                   key={label}
                   href={`#${label.toLowerCase()}`}
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.6875rem",
+                    fontFamily: "var(--font-figtree), sans-serif",
+                    fontSize: "0.80rem",
+                    fontWeight: 600,
                     color: "var(--color-dark-gray)",
                     textDecoration: "none",
                     letterSpacing: "0.1em",
@@ -130,25 +125,40 @@ export default function Footer() {
         >
           <span
             style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
+              fontFamily: "var(--font-figtree), sans-serif",
+              fontSize: "0.75rem",
+              fontWeight: 500,
               color: "var(--color-dark-gray)",
-              letterSpacing: "0.1em",
+              letterSpacing: "0.05em",
             }}
           >
             © 2026 POIRO. All rights reserved.
           </span>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
-              color: "var(--color-dark-gray)",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}
-          >
-            Engineering Creativity
-          </span>
+          <div style={{ display: "flex", gap: "16px" }}>
+            {["Privacy", "Terms", "Contact"].map((label) => (
+              <a
+                key={label}
+                href={`#${label.toLowerCase()}`}
+                style={{
+                  fontFamily: "var(--font-figtree), sans-serif",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "var(--color-dark-gray)",
+                  textDecoration: "none",
+                  letterSpacing: "0.05em",
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "var(--color-brand-orange)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "var(--color-dark-gray)")
+                }
+              >
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
