@@ -111,27 +111,29 @@ export default function LogoMarquee() {
             overflow: "hidden",
           }}
         >
+          {/* Left fade gradient - wider on mobile to prevent white line glitch */}
           <div
             style={{
               position: "absolute",
               left: 0,
               top: 0,
-              width: "56px",
+              width: "clamp(80px, 12vw, 100px)",
               height: "100%",
-              background: "linear-gradient(to right, #000, transparent)",
+              background: "linear-gradient(to right, #000 0%, #000 20%, transparent 100%)",
               zIndex: 1,
               pointerEvents: "none",
             }}
           />
 
+          {/* Right fade gradient - wider on mobile to prevent white line glitch */}
           <div
             style={{
               position: "absolute",
               right: 0,
               top: 0,
-              width: "56px",
+              width: "clamp(80px, 12vw, 100px)",
               height: "100%",
-              background: "linear-gradient(to left, #000, transparent)",
+              background: "linear-gradient(to left, #000 0%, #000 20%, transparent 100%)",
               zIndex: 1,
               pointerEvents: "none",
             }}

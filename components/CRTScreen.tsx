@@ -9,10 +9,23 @@ const comfortaa = Comfortaa({
   display: "swap",
 });
 
+/* ═══════════════════════════════════════════════════════
+   CRT TEXT SIZING
+   Desktop: Uses viewport-based scaling
+   Mobile: Uses fixed pixel sizes (easier to read on small screens)
+   ═══════════════════════════════════════════════════════ */
 const CRT_FONT_SIZES = {
-  poiro: "clamp(20px, 3vw, 45px)",
-  engineering: "clamp(4px, 1vw, 14px)",
-  creativity: "clamp(6px, 1vw, 14px)",
+  // Desktop sizes (clamp for responsive scaling)
+  desktop: {
+    poiro: "clamp(20px, 3vw, 45px)",
+    engineering: "clamp(4px, 1vw, 14px)",
+    creativity: "clamp(6px, 1vw, 14px)",
+  },
+  // Mobile sizes (fixed pixels for better control in small CRT)
+  mobile: {
+    engineering: "9px",   // Adjust this if "Engineering" text is too small/large
+    creativity: "9px",    // Adjust this if "Creativity." text is too small/large
+  }
 } as const;
 
 /* ═══════════════════════════════════════════════════════
@@ -25,6 +38,17 @@ const CRT_FONT_SIZES = {
 export function CRTScreen({ className = "" }: { className?: string }) {
   const [activeView, setActiveView] = useState<"logo" | "text">("logo");
   const [isGlitching, setIsGlitching] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for text sizing
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -161,16 +185,16 @@ export function CRTScreen({ className = "" }: { className?: string }) {
             isGlitching ? "opacity-50" : "opacity-100"
           } flex items-center justify-center w-full h-full`}
         >
-          {activeView === "logo" ? <PoiroLogo /> : <TextLogo />}
+          {activeView === "logo" ? <PoiroLogo /> : <TextLogo isMobile={isMobile} />}
         </div>
 
         {isGlitching && (
           <>
             <div className="glitch-layer glitch-layer-1">
-              {activeView === "logo" ? <PoiroLogo /> : <TextLogo />}
+              {activeView === "logo" ? <PoiroLogo /> : <TextLogo isMobile={isMobile} />}
             </div>
             <div className="glitch-layer glitch-layer-2">
-              {activeView === "logo" ? <PoiroLogo /> : <TextLogo />}
+              {activeView === "logo" ? <PoiroLogo /> : <TextLogo isMobile={isMobile} />}
             </div>
           </>
         )}
@@ -189,19 +213,25 @@ const PoiroLogo = () => (
   </div>
 );
 
-const TextLogo = () => (
+const TextLogo = ({ isMobile }: { isMobile: boolean }) => (
   <div
     className={`crt-text-wrap text-white glow-text drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] ${comfortaa.className}`}
   >
     <span
       className="font-black uppercase tracking-widest block"
-      style={{ fontSize: CRT_FONT_SIZES.engineering, lineHeight: 1.05 }}
+      style={{ 
+        fontSize: isMobile ? CRT_FONT_SIZES.mobile.engineering : CRT_FONT_SIZES.desktop.engineering, 
+        lineHeight: 1.05 
+      }}
     >
       Engineering
     </span>
     <span
       className="font-bold uppercase tracking-[0.14em] text-[#888] block"
-      style={{ fontSize: CRT_FONT_SIZES.creativity, lineHeight: 1.05 }}
+      style={{ 
+        fontSize: isMobile ? CRT_FONT_SIZES.mobile.creativity : CRT_FONT_SIZES.desktop.creativity, 
+        lineHeight: 1.05 
+      }}
     >
       Creativity.
     </span>

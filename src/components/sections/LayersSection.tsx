@@ -126,7 +126,7 @@ export default function LayersSection() {
       ref={sectionRef}
       id="layers"
       style={{
-        padding: "48px 48px 80px", /* Adjusted: Smaller top/bottom padding to reduce gaps, removed negative marginTop */
+        padding: "48px clamp(20px, 5vw, 48px) 80px", /* Responsive horizontal padding */
         background: "var(--color-background)",
         minHeight: "55vh",
         display: "flex",

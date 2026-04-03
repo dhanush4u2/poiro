@@ -567,55 +567,59 @@ function BriefCTASection() {
       </style>
 
       <div
-        className="relative z-10 w-full flex flex-col items-center"
-        style={{ maxWidth: 1400, margin: "0 auto" }}
+        className="relative z-10 w-full flex flex-col items-center brief-cta-container"
+        style={{ maxWidth: 1400, margin: "0 auto", padding: "0 16px" }}
       >
+        {/* Header section with title and subtitle */}
         <div
-          className="w-full text-center"
-          style={{ maxWidth: 1120, margin: "0 auto", marginBottom: "clamp(28px, 4vw, 56px)" }}
+          className="w-full text-center brief-cta-header"
+          style={{ maxWidth: 1120, margin: "0 auto", marginBottom: "clamp(24px, 4vw, 56px)" }}
         >
-          <h2 className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tighter ${figtree.className}`}>
+          <h2 className={`text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tighter ${figtree.className}`}>
             <span className="brief-animate-text-flow">Unbelievable</span> right?
           </h2>
           <h4
             style={{
               fontFamily: "var(--font-figtree)",
-              marginTop: "clamp(15px, 2.4vw, 15px)",
-              fontSize: "clamp(14px, 2vw, 24px)",
+              marginTop: "clamp(12px, 2.4vw, 20px)",
+              fontSize: "clamp(13px, 2vw, 24px)",
               lineHeight: 1.45,
               fontWeight: 600,
               color: "#c6c6c6",
               letterSpacing: "0.01em",
+              padding: "0 8px",
             }}
           >
             Send Us Your Idea & We'll Bring It To Life.
           </h4>
         </div>
 
+        {/* Upload card */}
         <div
           onClick={handleUploadClick}
           onMouseEnter={() => uploadState === "idle" && setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className={`relative w-full max-w-[1120px] mx-auto rounded-[2rem] transition-all duration-700 flex flex-col items-center justify-center px-6 md:px-8 py-16 md:py-20 ${
+          className={`brief-upload-card relative w-full max-w-[1120px] mx-auto rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-700 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-20 ${
             uploadState === "idle"
               ? "bg-[#050505]/30 hover:bg-[#ff8015]/[0.02] cursor-pointer group shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]"
               : uploadState === "uploading"
               ? "bg-[#ff8015]/[0.02] cursor-wait shadow-[inset_0_0_80px_rgba(255,95,31,0.05)]"
               : "bg-green-500/[0.02] cursor-default shadow-[inset_0_0_80px_rgba(34,197,94,0.05)]"
           }`}
-          style={{ minHeight: "clamp(250px, 26vw, 360px)" }}
+          style={{ minHeight: "clamp(220px, 30vw, 360px)" }}
         >
+          {/* Dashed border */}
           <div className="absolute inset-0 pointer-events-none p-[1px] z-0">
-            <svg width="100%" height="100%" className="overflow-visible rounded-[2rem]">
+            <svg width="100%" height="100%" className="overflow-visible rounded-[1.5rem] sm:rounded-[2rem]">
               <rect
                 x="0"
                 y="0"
                 width="100%"
                 height="100%"
-                rx="32"
+                rx="24"
                 fill="none"
                 strokeWidth="2"
-                strokeDasharray="16 16"
+                strokeDasharray="12 12"
                 className={`transition-colors duration-700 ${
                   uploadState === "idle"
                     ? "stroke-[#444] group-hover:stroke-[#ff8015]/50"
@@ -627,17 +631,19 @@ function BriefCTASection() {
             </svg>
           </div>
 
+          {/* Folder icon animation */}
           <div
             className={`relative z-20 transition-all duration-500 ease-out flex justify-center w-full ${
               uploadState === "idle"
-                ? "opacity-100 translate-y-0 h-[90px] mb-8"
+                ? "opacity-100 translate-y-0 h-[70px] sm:h-[90px] mb-6 sm:mb-8"
                 : "opacity-0 translate-y-8 h-0 mb-0"
             }`}
           >
             <AnimatedFolder isHovered={isHovered} />
           </div>
 
-          <div className="relative z-30">
+          {/* Button and glow effects */}
+          <div className="relative z-40">
             <div
               className={`absolute -inset-2 rounded-full blur-xl transition duration-700 ${
                 uploadState === "idle"
@@ -658,7 +664,7 @@ function BriefCTASection() {
               type="button"
               disabled={uploadState === "uploading"}
               style={{ fontFamily: "var(--font-figtree)" }}
-              className={`relative min-w-[300px] md:min-w-[340px] min-h-[52px] md:min-h-[58px] px-12 md:px-14 py-4 md:py-5 backdrop-blur-md rounded-full font-bold uppercase tracking-[0.16em] text-[15px] overflow-hidden flex items-center justify-center transition-all duration-500 ${
+              className={`relative min-w-[240px] sm:min-w-[300px] md:min-w-[340px] min-h-[48px] sm:min-h-[52px] md:min-h-[58px] px-8 sm:px-12 md:px-14 py-3 sm:py-4 md:py-5 backdrop-blur-md rounded-full font-bold uppercase tracking-[0.12em] sm:tracking-[0.16em] text-[13px] sm:text-[15px] overflow-hidden flex items-center justify-center transition-all duration-500 ${
                 uploadState === "idle"
                   ? "bg-[#0a0a0a]/80 border border-white/20 text-white group-hover:bg-white group-hover:text-black group-hover:border-white group-hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] active:scale-[0.96] active:bg-[#e0e0e0] active:shadow-inner"
                   : uploadState === "uploading"
@@ -754,12 +760,13 @@ function BriefCTASection() {
             </button>
           </div>
 
+          {/* Helper text - inside card at bottom */}
           <div
-            className={`absolute bottom-8 transition-all duration-500 ${
+            className={`absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 transition-all duration-500 ${
               uploadState === "idle" ? "opacity-100" : "opacity-0 translate-y-2"
             }`}
           >
-            <span className="text-[#888] text-xs md:text-sm uppercase tracking-[0.2em] font-mono font-bold group-hover:text-[#ff8015]/80 transition-colors duration-500">
+            <span className="text-[#888] text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.15em] sm:tracking-[0.2em] font-mono font-bold group-hover:text-[#ff8015]/80 transition-colors duration-500 whitespace-nowrap">
               Click & Share your brief with us
             </span>
           </div>
